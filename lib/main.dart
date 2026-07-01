@@ -1,4 +1,4 @@
-import 'package:alkher/screens/login_screen.dart';
+import 'package:alkher/screens/splash_screen.dart';
 import 'package:alkher/styles/app_colors.dart';
 import 'package:flutter/material.dart';
 
@@ -31,7 +31,7 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      home: const LoginScreen(),
+      home: const SplashScreen(),
     );
   }
 }

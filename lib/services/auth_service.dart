@@ -20,4 +20,28 @@ class AuthService {
     final data = jsonDecode(response.body);
     return LoginResponse.fromJson(data);
   }
+
+  Future<LoginResponse> register({
+    required String name,
+    required String email,
+    required String password,
+    required String role,
+  }) async {
+    final response = await http.post(
+      Uri.parse('${ApiConstant.baseUrl}/users/register'),
+      headers: {'Content-type': 'application/json'},
+      body: jsonEncode({
+        'name': name,
+        'email': email,
+        'password': password,
+        'role': role,
+      }),
+    );
+
+    print("Register status: ${response.statusCode}");
+    print("Register body: ${response.body}");
+
+    final data = jsonDecode(response.body);
+    return LoginResponse.fromJson(data);
+  }
 }

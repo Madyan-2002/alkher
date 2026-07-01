@@ -1,8 +1,9 @@
-import 'package:alkher/screens/add_product_screen.dart';
 import 'package:alkher/screens/admin_screen.dart';
 import 'package:alkher/screens/home_screen.dart';
+import 'package:alkher/screens/register_screen.dart';
 import 'package:alkher/services/auth_service.dart';
 import 'package:alkher/services/token_services.dart';
+import 'package:alkher/styles/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -21,11 +22,12 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.background,
       body: Column(
         children: [
           Container(
             width: double.infinity,
-            color: const Color(0xFF1A1A2E),
+            color: AppColors.primaryDark,
             padding: const EdgeInsets.only(top: 80, bottom: 32),
             child: Column(
               children: [
@@ -33,12 +35,12 @@ class _LoginScreenState extends State<LoginScreen> {
                   width: 56,
                   height: 56,
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.12),
+                    color: AppColors.textOnPrimary.withOpacity(0.12),
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: const Icon(
-                    Icons.shopping_bag_outlined,
-                    color: Colors.white,
+                    Icons.volunteer_activism,
+                    color: AppColors.textOnPrimary,
                     size: 28,
                   ),
                 ),
@@ -46,7 +48,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 const Text(
                   'مرحباً بك',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: AppColors.textOnPrimary,
                     fontSize: 20,
                     fontWeight: FontWeight.w500,
                   ),
@@ -55,7 +57,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 Text(
                   'سجّل دخولك للمتابعة',
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.55),
+                    color: AppColors.textOnPrimary.withOpacity(0.55),
                     fontSize: 13,
                   ),
                 ),
@@ -71,17 +73,39 @@ class _LoginScreenState extends State<LoginScreen> {
                   const SizedBox(height: 8),
                   const Text(
                     'البريد الإلكتروني',
-                    style: TextStyle(fontSize: 13, color: Colors.grey),
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: AppColors.textSecondary,
+                    ),
                   ),
                   const SizedBox(height: 6),
                   TextFormField(
                     controller: emailController,
                     keyboardType: TextInputType.emailAddress,
+                    style: const TextStyle(color: AppColors.textPrimary),
                     decoration: InputDecoration(
                       hintText: 'example@email.com',
-                      prefixIcon: const Icon(Icons.mail_outline),
+                      hintStyle: const TextStyle(color: AppColors.textHint),
+                      prefixIcon: const Icon(
+                        Icons.mail_outline,
+                        color: AppColors.textSecondary,
+                      ),
+                      filled: true,
+                      fillColor: AppColors.surface,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
+                        borderSide: const BorderSide(color: AppColors.border),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: const BorderSide(color: AppColors.border),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: const BorderSide(
+                          color: AppColors.borderFocus,
+                          width: 1.5,
+                        ),
                       ),
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 12,
@@ -92,27 +116,50 @@ class _LoginScreenState extends State<LoginScreen> {
                   const SizedBox(height: 16),
                   const Text(
                     'كلمة المرور',
-                    style: TextStyle(fontSize: 13, color: Colors.grey),
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: AppColors.textSecondary,
+                    ),
                   ),
                   const SizedBox(height: 6),
                   TextFormField(
                     controller: passwordController,
                     obscureText: _obscurePassword,
+                    style: const TextStyle(color: AppColors.textPrimary),
                     decoration: InputDecoration(
                       hintText: '••••••••',
-                      prefixIcon: const Icon(Icons.lock_outline),
+                      hintStyle: const TextStyle(color: AppColors.textHint),
+                      prefixIcon: const Icon(
+                        Icons.lock_outline,
+                        color: AppColors.textSecondary,
+                      ),
                       suffixIcon: IconButton(
                         icon: Icon(
                           _obscurePassword
                               ? Icons.visibility_outlined
                               : Icons.visibility_off_outlined,
+                          color: AppColors.textSecondary,
                         ),
                         onPressed: () => setState(
                           () => _obscurePassword = !_obscurePassword,
                         ),
                       ),
+                      filled: true,
+                      fillColor: AppColors.surface,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
+                        borderSide: const BorderSide(color: AppColors.border),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: const BorderSide(color: AppColors.border),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: const BorderSide(
+                          color: AppColors.borderFocus,
+                          width: 1.5,
+                        ),
                       ),
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 12,
@@ -127,7 +174,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       onPressed: () {},
                       child: const Text(
                         'نسيت كلمة المرور؟',
-                        style: TextStyle(color: Color(0xFF534AB7)),
+                        style: TextStyle(color: AppColors.primary),
                       ),
                     ),
                   ),
@@ -146,15 +193,13 @@ class _LoginScreenState extends State<LoginScreen> {
                                 password: passwordController.text,
                               );
 
-                              print("token: ${user.token}");
-                              print("name: ${user.name}");
-                              print("role: ${user.role}");
-
                               if (user.token.isEmpty) {
                                 setState(() => _isLoading = false);
+                                if (!mounted) return;
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('فشل تسجيل الدخول'),
+                                  SnackBar(
+                                    content: const Text('فشل تسجيل الدخول'),
+                                    backgroundColor: AppColors.error,
                                   ),
                                 );
                                 return;
@@ -164,6 +209,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                               setState(() => _isLoading = false);
 
+                              if (!mounted) return;
                               Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
@@ -174,17 +220,26 @@ class _LoginScreenState extends State<LoginScreen> {
                               );
                             },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF1A1A2E),
+                        backgroundColor: AppColors.primaryDark,
+                        disabledBackgroundColor: AppColors.primaryDark
+                            .withOpacity(0.5),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
                       child: _isLoading
-                          ? const CircularProgressIndicator(color: Colors.white)
+                          ? const SizedBox(
+                              width: 22,
+                              height: 22,
+                              child: CircularProgressIndicator(
+                                color: AppColors.textOnPrimary,
+                                strokeWidth: 2.5,
+                              ),
+                            )
                           : const Text(
                               'تسجيل الدخول',
                               style: TextStyle(
-                                color: Colors.white,
+                                color: AppColors.textOnPrimary,
                                 fontSize: 15,
                               ),
                             ),
@@ -196,14 +251,26 @@ class _LoginScreenState extends State<LoginScreen> {
                     children: [
                       const Text(
                         'ليس لديك حساب؟',
-                        style: TextStyle(fontSize: 13, color: Colors.grey),
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: AppColors.textSecondary,
+                        ),
                       ),
                       TextButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) {
+                                return const RegisterScreen();
+                              },
+                            ),
+                          );
+                        },
                         child: const Text(
                           'إنشاء حساب',
                           style: TextStyle(
-                            color: Color(0xFF534AB7),
+                            color: AppColors.primary,
                             fontWeight: FontWeight.w500,
                           ),
                         ),

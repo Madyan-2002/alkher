@@ -1,94 +1,193 @@
-import 'package:alkher/screens/add_product_screen.dart';
-import 'package:alkher/services/product_services.dart';
-import 'package:alkher/models/product_model.dart';
-import 'package:alkher/widget/product_card.dart';
+// lib/screens/home_screen.dart
+import 'package:alkher/screens/buy_screen.dart';
+import 'package:alkher/screens/donation_screen.dart';
+import 'package:alkher/screens/jobs_screen.dart';
+import 'package:alkher/screens/sell_screen.dart';
+import 'package:alkher/styles/app_colors.dart';
 import 'package:flutter/material.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
-
-  @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-  late Future<List<ProductModel>> _products;
-
-  @override
-  void initState() {
-    super.initState();
-    _products = ProductServices().getProducts();
-  }
-
-  void _refresh() {
-    setState(() {
-      _products = ProductServices().getProducts();
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        title: const Text(
-          'الخير',
-          style: TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.w600,
-            fontSize: 20,
+      backgroundColor: AppColors.background,
+      body: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // ── ترحيب ────────────────────────
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 24, 24, 8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'أهلاً بك 👋',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'شو بدك تسوي اليوم؟',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // ── الأقسام الأربعة ───────────────
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.all(24),
+                children: [
+                  _SectionCard(
+                    title: 'التبرعات',
+                    subtitle: 'ساهم بالخير وساعد المحتاجين',
+                    icon: Icons.volunteer_activism,
+                    color: AppColors.primaryDark,
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const DonationScreen(),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  _SectionCard(
+                    title: 'البيع',
+                    subtitle: 'اعرض منتجاتك للبيع بسهولة',
+                    icon: Icons.sell_outlined,
+                    color: const Color(0xFF1976D2),
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const SellScreen(),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  _SectionCard(
+                    title: 'الشراء',
+                    subtitle: 'تصفح المنتجات المعروضة واشتري',
+                    icon: Icons.shopping_bag_outlined,
+                    color: const Color(0xFFE65100),
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const BuyScreen(),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  _SectionCard(
+                    title: 'الوظائف',
+                    subtitle: 'تصفح فرص العمل أو أعلن عن وظيفة',
+                    icon: Icons.work_outline,
+                    color: const Color(0xFF6A1B9A),
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const JobsScreen(),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _SectionCard extends StatelessWidget {
+  final String title;
+  final String subtitle;
+  final IconData icon;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _SectionCard({
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: AppColors.surface,
+      borderRadius: BorderRadius.circular(16),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: AppColors.border),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.03),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 56,
+                height: 56,
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Icon(icon, color: color, size: 28),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      subtitle,
+                      style: const TextStyle(
+                        fontSize: 12.5,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(
+                Icons.arrow_back_ios,
+                size: 16,
+                color: AppColors.textHint,
+              ),
+            ],
           ),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(
-              Icons.add_circle_outline,
-              color: Color(0xFF1A73E8),
-            ),
-            onPressed: () async {
-              await Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const AddProductScreen()),
-              );
-              _refresh(); // يحدث القائمة بعد الإضافة
-            },
-          ),
-        ],
-      ),
-      body: FutureBuilder<List<ProductModel>>(
-        future: _products,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          if (snapshot.hasError) {
-            return Center(child: Text(snapshot.error.toString()));
-          }
-          final products = snapshot.data ?? [];
-          if (products.isEmpty) {
-            return const Center(
-              child: Text(
-                'لا يوجد منتجات',
-                style: TextStyle(color: Colors.grey),
-              ),
-            );
-          }
-          return GridView.builder(
-            padding: const EdgeInsets.all(12),
-            itemCount: products.length,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 12,
-              mainAxisSpacing: 12,
-              childAspectRatio: 0.75,
-            ),
-            itemBuilder: (context, index) {
-              return ProductCard(product: products[index]);
-            },
-          );
-        },
       ),
     );
   }
