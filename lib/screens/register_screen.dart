@@ -1,6 +1,8 @@
 import 'package:alkher/screens/login_screen.dart';
 import 'package:alkher/services/auth_service.dart';
 import 'package:alkher/styles/app_colors.dart';
+import 'package:alkher/widget/custom_text_field.dart';
+import 'package:alkher/widget/role_option.dart';
 import 'package:flutter/material.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -23,7 +25,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool _obscureConfirmPassword = true;
   bool _isLoading = false;
 
-  // ── الدور المختار وقت التسجيل ──────────
   String _selectedRole = 'customer';
 
   @override
@@ -33,38 +34,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     passwordController.dispose();
     confirmPasswordController.dispose();
     super.dispose();
-  }
-
-  InputDecoration _fieldDecoration({
-    required String hint,
-    required IconData icon,
-    Widget? suffixIcon,
-  }) {
-    return InputDecoration(
-      hintText: hint,
-      hintStyle: const TextStyle(color: AppColors.textHint),
-      prefixIcon: Icon(icon, color: AppColors.textSecondary),
-      suffixIcon: suffixIcon,
-      filled: true,
-      fillColor: AppColors.surface,
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: AppColors.border),
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: AppColors.border),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: AppColors.borderFocus, width: 1.5),
-      ),
-      errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: AppColors.error),
-      ),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-    );
   }
 
   Future<void> _handleRegister() async {
@@ -83,7 +52,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     if (!mounted) return;
 
-    // الـ register endpoint ما بيرجع token، فمنتحقق من حقل موجود فعليًا مثل name
     if (user.name.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -173,13 +141,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                     ),
                     const SizedBox(height: 6),
-                    TextFormField(
+                    CustomTextField(
                       controller: nameController,
-                      style: const TextStyle(color: AppColors.textPrimary),
-                      decoration: _fieldDecoration(
-                        hint: 'اسمك الكامل',
-                        icon: Icons.person_outline,
-                      ),
+                      hint: 'اسمك الكامل',
+                      icon: Icons.person_outline,
                       validator: (value) {
                         if (value == null || value.trim().isEmpty) {
                           return 'الرجاء إدخال الاسم';
@@ -200,23 +165,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                     ),
                     const SizedBox(height: 6),
-                    TextFormField(
+                    CustomTextField(
                       controller: emailController,
+                      hint: 'example@email.com',
+                      icon: Icons.mail_outline,
                       keyboardType: TextInputType.emailAddress,
-                      style: const TextStyle(color: AppColors.textPrimary),
-                      decoration: _fieldDecoration(
-                        hint: 'example@email.com',
-                        icon: Icons.mail_outline,
-                      ),
                       validator: (value) {
                         if (value == null || value.trim().isEmpty) {
                           return 'الرجاء إدخال البريد الإلكتروني';
-                        }
-                        final emailRegex = RegExp(
-                          r'^[^@\s]+@[^@\s]+\.[^@\s]+$',
-                        );
-                        if (!emailRegex.hasMatch(value.trim())) {
-                          return 'صيغة البريد الإلكتروني غير صحيحة';
                         }
                         return null;
                       },
@@ -231,31 +187,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                     ),
                     const SizedBox(height: 6),
-                    TextFormField(
+                    CustomTextField(
                       controller: passwordController,
+                      hint: '••••••••',
+                      icon: Icons.lock_outline,
                       obscureText: _obscurePassword,
-                      style: const TextStyle(color: AppColors.textPrimary),
-                      decoration: _fieldDecoration(
-                        hint: '••••••••',
-                        icon: Icons.lock_outline,
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            _obscurePassword
-                                ? Icons.visibility_off_outlined
-                                : Icons.visibility_outlined,
-                            color: AppColors.textSecondary,
-                          ),
-                          onPressed: () => setState(
-                            () => _obscurePassword = !_obscurePassword,
-                          ),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _obscurePassword
+                              ? Icons.visibility_off_outlined
+                              : Icons.visibility_outlined,
                         ),
+                        onPressed: () {
+                          setState(() {
+                            _obscurePassword = !_obscurePassword;
+                          });
+                        },
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'الرجاء إدخال كلمة المرور';
-                        }
-                        if (value.length < 6) {
-                          return 'كلمة المرور يجب أن تكون 6 أحرف على الأقل';
                         }
                         return null;
                       },
@@ -270,25 +221,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                     ),
                     const SizedBox(height: 6),
-                    TextFormField(
+                    CustomTextField(
                       controller: confirmPasswordController,
                       obscureText: _obscureConfirmPassword,
-                      style: const TextStyle(color: AppColors.textPrimary),
-                      decoration: _fieldDecoration(
-                        hint: '••••••••',
-                        icon: Icons.lock_outline,
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            _obscureConfirmPassword
-                                ? Icons.visibility_off_outlined
-                                : Icons.visibility_outlined,
-                            color: AppColors.textSecondary,
-                          ),
-                          onPressed: () => setState(
-                            () => _obscureConfirmPassword =
-                                !_obscureConfirmPassword,
-                          ),
+                      hint: '••••••••',
+                      icon: Icons.lock_outline,
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _obscureConfirmPassword
+                              ? Icons.visibility_off_outlined
+                              : Icons.visibility_outlined,
                         ),
+                        onPressed: () {
+                          setState(() {
+                            _obscureConfirmPassword = !_obscureConfirmPassword;
+                          });
+                        },
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
@@ -302,7 +250,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                     const SizedBox(height: 20),
 
-                    // ── اختيار نوع الحساب ──────────
                     const Text(
                       'نوع الحساب',
                       style: TextStyle(
@@ -314,7 +261,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     Row(
                       children: [
                         Expanded(
-                          child: _RoleOption(
+                          child: RoleOption(
                             label: 'مستخدم',
                             subtitle: 'أشتري وأتصفح',
                             icon: Icons.person_outline,
@@ -325,7 +272,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                         const SizedBox(width: 12),
                         Expanded(
-                          child: _RoleOption(
+                          child: RoleOption(
                             label: 'بائع / صاحب عمل',
                             subtitle: 'أنشر إعلانات',
                             icon: Icons.storefront_outlined,
@@ -400,69 +347,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _RoleOption extends StatelessWidget {
-  final String label;
-  final String subtitle;
-  final IconData icon;
-  final bool isSelected;
-  final VoidCallback onTap;
-
-  const _RoleOption({
-    required this.label,
-    required this.subtitle,
-    required this.icon,
-    required this.isSelected,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(12),
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
-        decoration: BoxDecoration(
-          color: isSelected ? AppColors.primaryLight : AppColors.surface,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: isSelected ? AppColors.primary : AppColors.border,
-            width: isSelected ? 1.5 : 1,
-          ),
-        ),
-        child: Column(
-          children: [
-            Icon(
-              icon,
-              color: isSelected ? AppColors.primary : AppColors.textSecondary,
-              size: 26,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: isSelected
-                    ? AppColors.primaryDark
-                    : AppColors.textPrimary,
-              ),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              subtitle,
-              style: const TextStyle(
-                fontSize: 11,
-                color: AppColors.textSecondary,
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }

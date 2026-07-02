@@ -53,11 +53,15 @@ class ProductCard extends StatelessWidget {
               borderRadius: const BorderRadius.vertical(
                 top: Radius.circular(12),
               ),
-              child: product.image.isNotEmpty
+              child:
+                  product
+                      .images
+                      .isNotEmpty // 💡 تعديل: تم تغييرها إلى images لتطابق الموديل
                   ? Image.network(
                       _getImageUrl(
-                        product.image[0],
-                      ), // استدعاء الدالة هنا سيعمل الآن بدون أخطاء
+                        product
+                            .images[0], // 💡 تعديل: تم تغييرها إلى images للوصول لأول صورة بأمان
+                      ),
                       width: double.infinity,
                       fit: BoxFit.cover,
                       errorBuilder: (_, error, ___) {
@@ -93,7 +97,10 @@ class ProductCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  '\$${product.price.toStringAsFixed(2)}',
+                  // 💡 ملاحظة: بما أن السعر نل لبعض الحالات (مثل التبرعات والوظائف)، قمت بإضافة حماية بالنل `?` وقيمة افتراضية
+                  product.price != null
+                      ? '\$${product.price!.toStringAsFixed(2)}'
+                      : 'N/A',
                   style: const TextStyle(
                     color: Color(0xFF1A73E8),
                     fontWeight: FontWeight.w600,

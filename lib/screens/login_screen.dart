@@ -1,9 +1,10 @@
 import 'package:alkher/screens/admin_screen.dart';
-import 'package:alkher/screens/home_screen.dart';
+import 'package:alkher/screens/main_screen.dart';
 import 'package:alkher/screens/register_screen.dart';
 import 'package:alkher/services/auth_service.dart';
 import 'package:alkher/services/token_services.dart';
 import 'package:alkher/styles/app_colors.dart';
+import 'package:alkher/widget/custom_text_field.dart';
 import 'package:flutter/material.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -79,39 +80,17 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   const SizedBox(height: 6),
-                  TextFormField(
+                  CustomTextField(
                     controller: emailController,
+                    hint: 'example@email.com',
+                    icon: Icons.mail_outline,
                     keyboardType: TextInputType.emailAddress,
-                    style: const TextStyle(color: AppColors.textPrimary),
-                    decoration: InputDecoration(
-                      hintText: 'example@email.com',
-                      hintStyle: const TextStyle(color: AppColors.textHint),
-                      prefixIcon: const Icon(
-                        Icons.mail_outline,
-                        color: AppColors.textSecondary,
-                      ),
-                      filled: true,
-                      fillColor: AppColors.surface,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: const BorderSide(color: AppColors.border),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: const BorderSide(color: AppColors.border),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: const BorderSide(
-                          color: AppColors.borderFocus,
-                          width: 1.5,
-                        ),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 14,
-                      ),
-                    ),
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return 'الرجاء إدخال البريد الإلكتروني';
+                      }
+                      return null;
+                    },
                   ),
                   const SizedBox(height: 16),
                   const Text(
@@ -122,50 +101,29 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   const SizedBox(height: 6),
-                  TextFormField(
+                  CustomTextField(
                     controller: passwordController,
+                    hint: '••••••••',
+                    icon: Icons.lock_outline,
                     obscureText: _obscurePassword,
-                    style: const TextStyle(color: AppColors.textPrimary),
-                    decoration: InputDecoration(
-                      hintText: '••••••••',
-                      hintStyle: const TextStyle(color: AppColors.textHint),
-                      prefixIcon: const Icon(
-                        Icons.lock_outline,
-                        color: AppColors.textSecondary,
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _obscurePassword
+                            ? Icons.visibility_off_outlined
+                            : Icons.visibility_outlined,
                       ),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _obscurePassword
-                              ? Icons.visibility_outlined
-                              : Icons.visibility_off_outlined,
-                          color: AppColors.textSecondary,
-                        ),
-                        onPressed: () => setState(
-                          () => _obscurePassword = !_obscurePassword,
-                        ),
-                      ),
-                      filled: true,
-                      fillColor: AppColors.surface,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: const BorderSide(color: AppColors.border),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: const BorderSide(color: AppColors.border),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: const BorderSide(
-                          color: AppColors.borderFocus,
-                          width: 1.5,
-                        ),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 14,
-                      ),
+                      onPressed: () {
+                        setState(() {
+                          _obscurePassword = !_obscurePassword;
+                        });
+                      },
                     ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'الرجاء إدخال كلمة المرور';
+                      }
+                      return null;
+                    },
                   ),
                   const SizedBox(height: 12),
                   Align(
@@ -214,8 +172,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => user.role == 'admin'
-                                      ? AdminScreen()
-                                      : HomeScreen(),
+                                      ? const AdminScreen()
+                                      : const MainScreen(),
                                 ),
                               );
                             },
