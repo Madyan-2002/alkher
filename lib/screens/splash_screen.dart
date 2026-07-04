@@ -1,4 +1,7 @@
 import 'package:alkher/screens/login_screen.dart';
+import 'package:alkher/screens/seller/seller_screen.dart';
+import 'package:alkher/screens/user/main_screen.dart';
+import 'package:alkher/services/token_services.dart';
 import 'package:alkher/styles/app_colors.dart';
 import 'package:flutter/material.dart';
 
@@ -33,13 +36,35 @@ class _SplashScreenState extends State<SplashScreen>
 
     _controller.forward();
 
-    Future.delayed(const Duration(milliseconds: 2500), () {
-      if (mounted) {
-        Navigator.of(
-          context,
-        ).pushReplacement(MaterialPageRoute(builder: (_) => LoginScreen()));
-      }
-    });
+    _checkSessionAndNavigate();
+  }
+
+  Future<void> _checkSessionAndNavigate() async {
+
+    await Future.delayed(const Duration(milliseconds: 2000));
+
+    if (!mounted) return;
+
+    final token = await TokenServices().getToken();
+    final role = await TokenServices().getRole();
+
+    Widget destination;
+
+    if (token == null || token.isEmpty) {
+      // ما في توكن محفوظ → لازم يسجل دخول
+      destination = const LoginScreen();
+    } else if (role == 'seller') {
+      destination = const SellerScreen();
+    } else if (role == 'customer') {
+      destination = const MainScreen();
+    } else {
+      destination = const LoginScreen();
+    }
+
+    if (!mounted) return;
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (_) => destination),
+    );
   }
 
   @override

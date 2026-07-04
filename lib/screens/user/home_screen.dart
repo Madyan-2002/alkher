@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:alkher/screens/buy_screen.dart';
-import 'package:alkher/screens/donation_screen.dart';
-import 'package:alkher/screens/jobs_screen.dart';
+import 'package:alkher/screens/user/buy_screen.dart';
+import 'package:alkher/screens/user/donation_screen.dart';
+import 'package:alkher/screens/user/jobs_screen.dart';
 import 'package:alkher/styles/app_colors.dart';
 
 class HomeScreen extends StatelessWidget {

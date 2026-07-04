@@ -1,7 +1,7 @@
-import 'package:alkher/screens/cart_screen_user.dart';
-import 'package:alkher/screens/favorite_screen_user.dart';
-import 'package:alkher/screens/home_screen.dart';
-import 'package:alkher/screens/profile_screen_user.dart';
+import 'package:alkher/screens/user/cart_screen_user.dart';
+import 'package:alkher/screens/user/favorite_screen_user.dart';
+import 'package:alkher/screens/user/home_screen.dart';
+import 'package:alkher/screens/user/profile_screen_user.dart';
 import 'package:alkher/styles/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';

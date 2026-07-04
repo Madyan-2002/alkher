@@ -6,39 +6,99 @@ class ProductCard extends StatelessWidget {
   final ProductModel product;
   const ProductCard({super.key, required this.product});
 
-  String _getImageUrl(String imagePath) {
+  // ── جعلتها static عشان أي شاشة تانية (متل MyListingsScreen) تقدر تستخدمها بدون تكرار ──
+  static String getImageUrl(String imagePath) {
     if (imagePath.startsWith('http')) {
       return imagePath;
     }
 
-    // تنظيف أي سلاش زائدة من بداية مسار الصورة القادم من السيرفر
     if (imagePath.startsWith('/')) {
       imagePath = imagePath.substring(1);
     }
 
-    // جلب الـ baseUrl كاملًا: http://192.168.100.13:3000/alkher/v1
     String baseUrl = ApiConstant.baseUrl;
-
-    // تنظيف السلاش من نهاية الـ baseUrl إن وُجدت
     if (baseUrl.endsWith('/')) {
       baseUrl = baseUrl.substring(0, baseUrl.length - 1);
     }
 
-    String finalUrl;
-    // إذا كان السيرفر يرسل كلمة "uploads/" ضمن الـ Path، ندمجها مباشرة مع الـ baseUrl
     if (imagePath.contains('uploads')) {
-      finalUrl = '$baseUrl/$imagePath';
-    } else {
-      // إذا كان يرسل اسم الملف مجرداً، نقوم نحن بإضافة uploads/ في المنتصف
-      finalUrl = '$baseUrl/uploads/$imagePath';
+      return '$baseUrl/$imagePath';
     }
+    return '$baseUrl/uploads/$imagePath';
+  }
 
-    print("🎯 الرابط النهائي الفعلي للتحميل: $finalUrl");
-    return finalUrl;
+  // ── تسمية النوع بالعربي ────────────────
+  String _typeLabel() {
+    switch (product.type) {
+      case 'sell':
+        return 'بيع';
+      case 'donation':
+        return 'تبرع';
+      case 'job':
+        return 'وظيفة';
+      default:
+        return 'أخرى';
+    }
+  }
+
+  Color _typeColor() {
+    switch (product.type) {
+      case 'sell':
+        return const Color(0xFF1976D2);
+      case 'donation':
+        return const Color(0xFF2E7D32);
+      case 'job':
+        return const Color(0xFF6A1B9A);
+      default:
+        return Colors.grey;
+    }
+  }
+
+  // ── القيمة المعروضة تختلف حسب النوع، وكل حقل nullable ──
+  Widget? _buildValueLabel() {
+    switch (product.type) {
+      case 'sell':
+        if (product.price == null) return null;
+        return Text(
+          '\$${product.price!.toStringAsFixed(2)}',
+          style: const TextStyle(
+            color: Color(0xFF1A73E8),
+            fontWeight: FontWeight.w600,
+            fontSize: 13,
+          ),
+        );
+
+      case 'job':
+        if (product.salary == null) return null;
+        return Text(
+          '\$${product.salary!.toStringAsFixed(0)} / شهريًا',
+          style: const TextStyle(
+            color: Color(0xFF6A1B9A),
+            fontWeight: FontWeight.w600,
+            fontSize: 13,
+          ),
+        );
+
+      case 'donation':
+        if (product.targetAmount == null) return null;
+        return Text(
+          'الهدف: \$${product.targetAmount!.toStringAsFixed(0)}',
+          style: const TextStyle(
+            color: Color(0xFF2E7D32),
+            fontWeight: FontWeight.w600,
+            fontSize: 13,
+          ),
+        );
+
+      default:
+        return null; // "أخرى" ما إلها قيمة رقمية تُعرض
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final valueLabel = _buildValueLabel();
+
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -49,36 +109,60 @@ class ProductCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(
-            child: ClipRRect(
-              borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(12),
-              ),
-              child:
-                  product
-                      .images
-                      .isNotEmpty // 💡 تعديل: تم تغييرها إلى images لتطابق الموديل
-                  ? Image.network(
-                      _getImageUrl(
-                        product
-                            .images[0], // 💡 تعديل: تم تغييرها إلى images للوصول لأول صورة بأمان
-                      ),
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, error, ___) {
-                        print("Error loading image: $error");
-                        return Container(
-                          color: Colors.grey.shade100,
-                          child: const Icon(
-                            Icons.image_not_supported,
-                            color: Colors.grey,
+            child: Stack(
+              children: [
+                ClipRRect(
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(12),
+                  ),
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: double.infinity,
+                    child: product.images.isNotEmpty
+                        ? Image.network(
+                            getImageUrl(product.images[0]),
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, error, ___) {
+                              return Container(
+                                color: Colors.grey.shade100,
+                                child: const Icon(
+                                  Icons.image_not_supported,
+                                  color: Colors.grey,
+                                ),
+                              );
+                            },
+                          )
+                        : Container(
+                            color: Colors.grey.shade100,
+                            child: const Icon(Icons.image, color: Colors.grey),
                           ),
-                        );
-                      },
-                    )
-                  : Container(
-                      color: Colors.grey.shade100,
-                      child: const Icon(Icons.image, color: Colors.grey),
+                  ),
+                ),
+                // ── شارة النوع أعلى الصورة ──────────
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 3,
                     ),
+                    decoration: BoxDecoration(
+                      color: _typeColor(),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      _typeLabel(),
+                      style: const TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
           Padding(
@@ -95,18 +179,10 @@ class ProductCard extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  // 💡 ملاحظة: بما أن السعر نل لبعض الحالات (مثل التبرعات والوظائف)، قمت بإضافة حماية بالنل `?` وقيمة افتراضية
-                  product.price != null
-                      ? '\$${product.price!.toStringAsFixed(2)}'
-                      : 'N/A',
-                  style: const TextStyle(
-                    color: Color(0xFF1A73E8),
-                    fontWeight: FontWeight.w600,
-                    fontSize: 13,
-                  ),
-                ),
+                if (valueLabel != null) ...[
+                  const SizedBox(height: 4),
+                  valueLabel,
+                ],
               ],
             ),
           ),

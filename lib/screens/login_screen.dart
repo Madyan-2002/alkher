@@ -1,5 +1,5 @@
-import 'package:alkher/screens/admin_screen.dart';
-import 'package:alkher/screens/main_screen.dart';
+import 'package:alkher/screens/seller/seller_screen.dart';
+import 'package:alkher/screens/user/main_screen.dart';
 import 'package:alkher/screens/register_screen.dart';
 import 'package:alkher/services/auth_service.dart';
 import 'package:alkher/services/token_services.dart';
@@ -19,6 +19,51 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController passwordController = TextEditingController();
   bool _obscurePassword = true;
   bool _isLoading = false;
+
+  Future<void> _handleLogin() async {
+    setState(() => _isLoading = true);
+
+    final user = await AuthService().login(
+      email: emailController.text,
+      password: passwordController.text,
+    );
+
+    if (user.token.isEmpty) {
+      setState(() => _isLoading = false);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('فشل تسجيل الدخول'),
+          backgroundColor: AppColors.error,
+        ),
+      );
+      return;
+    }
+
+    // ── حفظ التوكن والدور مع بعض ──────────
+    await TokenServices().saveToken(user.token);
+    await TokenServices().saveRole(user.role);
+
+    setState(() => _isLoading = false);
+
+    if (!mounted) return;
+
+    // ── تحديد الوجهة بشكل صريح حسب الدور ──
+    Widget destination;
+    if (user.role == 'seller') {
+      destination = const SellerScreen();
+    } else if (user.role == 'customer') {
+      destination = const MainScreen();
+    } else {
+      // دور غير متوقع - افتراضيًا يروح على واجهة المستخدم العادي
+      destination = const MainScreen();
+    }
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => destination),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -141,42 +186,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     width: double.infinity,
                     height: 50,
                     child: ElevatedButton(
-                      onPressed: _isLoading
-                          ? null
-                          : () async {
-                              setState(() => _isLoading = true);
-
-                              final user = await AuthService().login(
-                                email: emailController.text,
-                                password: passwordController.text,
-                              );
-
-                              if (user.token.isEmpty) {
-                                setState(() => _isLoading = false);
-                                if (!mounted) return;
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: const Text('فشل تسجيل الدخول'),
-                                    backgroundColor: AppColors.error,
-                                  ),
-                                );
-                                return;
-                              }
-
-                              await TokenServices().saveToken(user.token);
-
-                              setState(() => _isLoading = false);
-
-                              if (!mounted) return;
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => user.role == 'admin'
-                                      ? const AdminScreen()
-                                      : const MainScreen(),
-                                ),
-                              );
-                            },
+                      onPressed: _isLoading ? null : _handleLogin,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primaryDark,
                         disabledBackgroundColor: AppColors.primaryDark
