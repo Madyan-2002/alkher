@@ -16,6 +16,7 @@ class TypeSpecificFields extends StatelessWidget {
   final List<CategoryModel> categories;
   final CategoryModel? selectedCategory;
   final ValueChanged<CategoryModel?> onCategoryChanged;
+  final VoidCallback onCategoryAdded;
 
   // حقول التبرع
   final TextEditingController targetAmountController;
@@ -40,6 +41,7 @@ class TypeSpecificFields extends StatelessWidget {
     required this.onPickDeadline,
     required this.salaryController,
     required this.locationController,
+    required this.onCategoryAdded,
   });
 
   @override
@@ -54,6 +56,7 @@ class TypeSpecificFields extends StatelessWidget {
           categories: categories,
           selectedCategory: selectedCategory,
           onCategoryChanged: onCategoryChanged,
+          onCategoryAdded: onCategoryAdded ,
         );
       case 'donation':
         return DonationFieldsWidget(

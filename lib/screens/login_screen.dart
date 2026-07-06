@@ -1,3 +1,4 @@
+import 'package:alkher/providers/favorite_provider.dart';
 import 'package:alkher/screens/seller/seller_screen.dart';
 import 'package:alkher/screens/user/main_screen.dart';
 import 'package:alkher/screens/register_screen.dart';
@@ -6,6 +7,7 @@ import 'package:alkher/services/token_services.dart';
 import 'package:alkher/styles/app_colors.dart';
 import 'package:alkher/widget/custom_text_field.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -40,22 +42,20 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
 
-    // ── حفظ التوكن والدور مع بعض ──────────
     await TokenServices().saveToken(user.token);
     await TokenServices().saveRole(user.role);
+
+    if (!mounted) return;
+    await context.read<FavoriteProvider>().loadFavorites();
 
     setState(() => _isLoading = false);
 
     if (!mounted) return;
 
-    // ── تحديد الوجهة بشكل صريح حسب الدور ──
     Widget destination;
     if (user.role == 'seller') {
       destination = const SellerScreen();
-    } else if (user.role == 'customer') {
-      destination = const MainScreen();
     } else {
-      // دور غير متوقع - افتراضيًا يروح على واجهة المستخدم العادي
       destination = const MainScreen();
     }
 

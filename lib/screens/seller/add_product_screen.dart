@@ -146,7 +146,6 @@ class _AddProductScreenState extends State<AddProductScreen> {
       _deadline = null;
       _selectedType = 'sell';
     });
-    _formKey.currentState?.reset();
   }
 
   void _showSnack(String message, {required bool isError}) {
@@ -274,6 +273,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                           onPickDeadline: _pickDeadline,
                           salaryController: _salaryController,
                           locationController: _locationController,
+                          onCategoryAdded: _loadCategories,
                         ),
                       ),
                       const SizedBox(height: 24),

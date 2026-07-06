@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:alkher/models/category_model.dart';
+import 'package:alkher/services/category_service.dart';
 import 'package:alkher/styles/app_colors.dart';
 
-class SellFieldsWidget extends StatelessWidget {
+class SellFieldsWidget extends StatefulWidget {
   final Color accent;
   final TextEditingController priceController;
   final TextEditingController stockController;
   final List<CategoryModel> categories;
   final CategoryModel? selectedCategory;
   final ValueChanged<CategoryModel?> onCategoryChanged;
+  final VoidCallback onCategoryAdded; // ← جديد: يبلغ الشاشة الأب لإعادة تحميل التصنيفات
 
   const SellFieldsWidget({
     super.key,
@@ -18,7 +20,79 @@ class SellFieldsWidget extends StatelessWidget {
     required this.categories,
     required this.selectedCategory,
     required this.onCategoryChanged,
+    required this.onCategoryAdded,
   });
+
+  @override
+  State<SellFieldsWidget> createState() => _SellFieldsWidgetState();
+}
+
+class _SellFieldsWidgetState extends State<SellFieldsWidget> {
+  bool _isAddingCategory = false;
+
+  Future<void> _showAddCategoryDialog() async {
+    final controller = TextEditingController();
+
+    final name = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text('إضافة تصنيف جديد'),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          decoration: InputDecoration(
+            hintText: 'مثلاً: كتب',
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('إلغاء', style: TextStyle(color: AppColors.textSecondary)),
+          ),
+          TextButton(
+            onPressed: () {
+              if (controller.text.trim().isNotEmpty) {
+                Navigator.pop(context, controller.text.trim());
+              }
+            },
+            child: Text('إضافة', style: TextStyle(color: widget.accent, fontWeight: FontWeight.w600)),
+          ),
+        ],
+      ),
+    );
+
+    if (name == null || name.isEmpty) return;
+
+    setState(() => _isAddingCategory = true);
+
+    final success = await CategoryService().createCategory(name);
+
+    if (!mounted) return;
+    setState(() => _isAddingCategory = false);
+
+    if (success) {
+      widget.onCategoryAdded(); // يبلغ الشاشة الأب تعيد تحميل القائمة
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('تم إضافة "$name" بنجاح'),
+          backgroundColor: AppColors.success,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('فشل إضافة التصنيف'),
+          backgroundColor: AppColors.error,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,11 +107,9 @@ class SellFieldsWidget extends StatelessWidget {
                   _buildField(
                     label: 'السعر',
                     hint: '0.00',
-                    controller: priceController,
+                    controller: widget.priceController,
                     prefix: '\$ ',
-                    keyboardType: const TextInputType.numberWithOptions(
-                      decimal: true,
-                    ),
+                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
                   ),
                 ],
               ),
@@ -49,7 +121,7 @@ class SellFieldsWidget extends StatelessWidget {
                   _buildField(
                     label: 'الكمية',
                     hint: '0',
-                    controller: stockController,
+                    controller: widget.stockController,
                     keyboardType: TextInputType.number,
                   ),
                 ],
@@ -60,22 +132,43 @@ class SellFieldsWidget extends StatelessWidget {
         const SizedBox(height: 12),
         _buildCard(
           children: [
-            const Text(
-              'التصنيف',
-              style: TextStyle(
-                fontSize: 13,
-                color: AppColors.textSecondary,
-                fontWeight: FontWeight.w500,
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'التصنيف',
+                  style: TextStyle(fontSize: 13, color: AppColors.textSecondary, fontWeight: FontWeight.w500),
+                ),
+                GestureDetector(
+                  onTap: _isAddingCategory ? null : _showAddCategoryDialog,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _isAddingCategory
+                          ? SizedBox(
+                              width: 14,
+                              height: 14,
+                              child: CircularProgressIndicator(strokeWidth: 2, color: widget.accent),
+                            )
+                          : Icon(Icons.add_circle_outline, size: 16, color: widget.accent),
+                      const SizedBox(width: 4),
+                      Text(
+                        'إضافة تصنيف',
+                        style: TextStyle(fontSize: 12, color: widget.accent, fontWeight: FontWeight.w600),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 6),
             DropdownButtonFormField<CategoryModel>(
-              value: selectedCategory,
+              value: widget.selectedCategory,
               hint: const Text('اختر التصنيف'),
-              items: categories
+              items: widget.categories
                   .map((c) => DropdownMenuItem(value: c, child: Text(c.name)))
                   .toList(),
-              onChanged: onCategoryChanged,
+              onChanged: widget.onCategoryChanged,
               validator: (val) => val == null ? 'الرجاء اختيار تصنيف' : null,
               decoration: _inputDecoration(),
             ),
@@ -93,10 +186,7 @@ class SellFieldsWidget extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: AppColors.border),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: children,
-      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: children),
     );
   }
 
@@ -110,14 +200,7 @@ class SellFieldsWidget extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 13,
-            color: AppColors.textSecondary,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
+        Text(label, style: const TextStyle(fontSize: 13, color: AppColors.textSecondary, fontWeight: FontWeight.w500)),
         const SizedBox(height: 6),
         TextFormField(
           controller: controller,
@@ -142,7 +225,7 @@ class SellFieldsWidget extends StatelessWidget {
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
-        borderSide: BorderSide(color: accent, width: 1.5),
+        borderSide: BorderSide(color: widget.accent, width: 1.5),
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),

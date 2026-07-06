@@ -6,8 +6,6 @@ import 'package:alkher/services/token_services.dart';
 import 'package:http/http.dart' as http;
 
 class ProductServices {
-  // type: فلتر اختياري (sell/donation/job/other)
-  // mine: true = يرجع بس إعلانات المستخدم الحالي
   Future<List<ProductModel>> getProducts({
     String? type,
     bool mine = false,
@@ -78,6 +76,7 @@ class ProductServices {
     final body = await response.stream.bytesToString();
     print("Create status: ${response.statusCode}");
     print("Create body: $body");
+    
 
     return response.statusCode == 201;
   }

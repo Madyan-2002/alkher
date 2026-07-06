@@ -1,8 +1,10 @@
+import 'package:alkher/providers/favorite_provider.dart';
 import 'package:alkher/screens/login_screen.dart';
 import 'package:alkher/screens/seller/widgets/menu_tile_profile.dart';
 import 'package:alkher/services/token_services.dart';
 import 'package:alkher/styles/app_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class SellerProfileScreen extends StatelessWidget {
   const SellerProfileScreen({super.key});
@@ -39,6 +41,7 @@ class SellerProfileScreen extends StatelessWidget {
     if (confirmed == true) {
       await TokenServices().deleteToken();
       if (context.mounted) {
+        context.read<FavoriteProvider>().clear();
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (_) => const LoginScreen()),
@@ -54,7 +57,6 @@ class SellerProfileScreen extends StatelessWidget {
       backgroundColor: AppColors.background,
       body: Column(
         children: [
-          // ── Elevated Header (Premium look) ─────────────────
           Material(
             elevation: 6,
             shadowColor: Colors.black26,
@@ -86,7 +88,6 @@ class SellerProfileScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
-
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(16.0),
@@ -152,9 +153,7 @@ class SellerProfileScreen extends StatelessWidget {
                       ],
                     ),
                   ),
-
                   const SizedBox(height: 24),
-
                   // ── Section Title ──────────
                   const Text(
                     'الحساب',
@@ -165,7 +164,6 @@ class SellerProfileScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 10),
-
                   MenuTileProfile(
                     icon: Icons.notifications_outlined,
                     label: 'الإشعارات',

@@ -1,7 +1,7 @@
 import 'package:alkher/models/product_model.dart';
 import 'package:alkher/services/product_services.dart';
 import 'package:alkher/styles/app_colors.dart';
-import 'package:alkher/widget/product_card.dart';
+import 'package:alkher/screens/seller/widgets/product_card.dart';
 import 'package:flutter/material.dart';
 
 class MyListingsScreen extends StatefulWidget {

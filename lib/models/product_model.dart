@@ -2,26 +2,22 @@ class ProductModel {
   final String id;
   final String title;
   final String description;
-  final String type; // sell / donation / job / other
+  final String type;
 
-  // خاصة بـ sell
   final double? price;
   final int? stock;
   final String? categoryId;
   final String? categoryName;
 
-  // خاصة بـ donation
   final double? targetAmount;
   final DateTime? deadline;
 
-  // خاصة بـ job
   final double? salary;
   final String? location;
 
   final List<String> images;
   final String createdById;
   final String? createdByName;
-  final bool isFavorite;
 
   ProductModel({
     required this.id,
@@ -39,7 +35,6 @@ class ProductModel {
     required this.images,
     required this.createdById,
     this.createdByName,
-    this.isFavorite = false,
   });
 
   factory ProductModel.fromJson(Map<String, dynamic> json) {
@@ -61,16 +56,13 @@ class ProductModel {
       deadline: json['deadline'] != null
           ? DateTime.tryParse(json['deadline'])
           : null,
-      salary: json['salary'] != null
-          ? (json['salary'] as num).toDouble()
-          : null,
+      salary: json['salary'] != null ? (json['salary'] as num).toDouble() : null,
       location: json['location'],
       images: json['image'] != null ? List<String>.from(json['image']) : [],
       createdById: createdByField is Map
           ? (createdByField['_id'] ?? '')
           : (createdByField ?? ''),
       createdByName: createdByField is Map ? createdByField['name'] : null,
-      isFavorite: json['isFavorite'] ?? false,
     );
   }
 }

@@ -1,9 +1,11 @@
+import 'package:alkher/providers/favorite_provider.dart';
 import 'package:alkher/screens/login_screen.dart';
 import 'package:alkher/screens/seller/seller_screen.dart';
 import 'package:alkher/screens/user/main_screen.dart';
 import 'package:alkher/services/token_services.dart';
 import 'package:alkher/styles/app_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -40,8 +42,7 @@ class _SplashScreenState extends State<SplashScreen>
   }
 
   Future<void> _checkSessionAndNavigate() async {
-
-    await Future.delayed(const Duration(milliseconds: 2000));
+    await Future.delayed(const Duration(milliseconds: 2500));
 
     if (!mounted) return;
 
@@ -51,14 +52,18 @@ class _SplashScreenState extends State<SplashScreen>
     Widget destination;
 
     if (token == null || token.isEmpty) {
-      // ما في توكن محفوظ → لازم يسجل دخول
       destination = const LoginScreen();
-    } else if (role == 'seller') {
-      destination = const SellerScreen();
-    } else if (role == 'customer') {
-      destination = const MainScreen();
     } else {
-      destination = const LoginScreen();
+      if (!mounted) return;
+      await context.read<FavoriteProvider>().loadFavorites();
+
+      if (role == 'seller') {
+        destination = const SellerScreen();
+      } else if (role == 'customer') {
+        destination = const MainScreen();
+      } else {
+        destination = const LoginScreen();
+      }
     }
 
     if (!mounted) return;
