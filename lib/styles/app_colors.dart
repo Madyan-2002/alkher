@@ -10,18 +10,18 @@ class AppColors {
   static const secondary      = Color(0xFF66BB6A);
   static const accent         = Color(0xFFA5D6A7);
 
-  // ── Background ───────────────────────────
-  static const background     = Color(0xFFF5F5F5);
-  static const surface        = Color(0xFFFFFFFF);
+  // ── Background (تم التعديل إلى Off-White دافئ ومريح) ───
+  static const background     = Color(0xFFF9F9F7); // عاجي ناعم جداً مريح للعين بديل للرمادي المعتاد
+  static const surface        = Color(0xFFFAFAFA); // أبيض مكسور خفيف جداً لمنع توهج الشاشة الصافي
 
-  // ── Text ─────────────────────────────────
-  static const textPrimary    = Color(0xFF1A1A1A);
-  static const textSecondary  = Color(0xFF757575);
-  static const textHint       = Color(0xFFBDBDBD);
+  // ── Text (تعديل طفيف لتناسق أفضل) ─────────────────────────
+  static const textPrimary    = Color(0xFF1E201E); // أسود كربوني داكن بدلاً من الأسود الحاد
+  static const textSecondary  = Color(0xFF686D68); // رمادي مائل للخضرة العشبية الخافتة جداً
+  static const textHint       = Color(0xFFB4B8B4);
   static const textOnPrimary  = Color(0xFFFFFFFF);
 
-  // ── Border ───────────────────────────────
-  static const border         = Color(0xFFE0E0E0);
+  // ── Border (تم تنعيمها لتتماشى مع الألوان المكسورة) ────────
+  static const border         = Color(0xFFE5E8E5); // حدود ناعمة ومدمجة مع الخلفية الجديدة
   static const borderFocus    = Color(0xFF2E7D32);
 
   // ── Status ───────────────────────────────

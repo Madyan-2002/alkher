@@ -81,18 +81,23 @@ class _BuyScreenState extends State<BuyScreen> {
               return RefreshIndicator(
                 onRefresh: () => provider.refresh(_type),
 
-                child: GridView.builder(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: products.length,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    mainAxisSpacing: 14,
-                    crossAxisSpacing: 14,
-                    childAspectRatio: 0.72,
+                child: SafeArea(
+                  bottom: true,
+                  top: false,
+                  child: GridView.builder(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: products.length,
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          mainAxisSpacing: 14,
+                          crossAxisSpacing: 14,
+                          childAspectRatio: 0.72,
+                        ),
+                    itemBuilder: (context, index) {
+                      return CustomCard(product: products[index]);
+                    },
                   ),
-                  itemBuilder: (context, index) {
-                    return CustomCard(product: products[index]);
-                  },
                 ),
               );
           }

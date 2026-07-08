@@ -4,6 +4,7 @@ import 'package:alkher/screens/user/widgets/custom_card.dart';
 import 'package:alkher/services/favorite_service.dart';
 import 'package:alkher/styles/app_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 class FavoriteScreenUser extends StatefulWidget {
@@ -44,36 +45,94 @@ class _FavoriteScreenUserState extends State<FavoriteScreenUser> {
     }
   }
 
+  void _clearAllFavorites(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('حذف الكل', style: TextStyle(fontWeight: FontWeight.bold)),
+        content: const Text('هل أنت متأكد من رغبتك في إزالة جميع العناصر من المفضلة؟'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('إلغاء', style: TextStyle(color: Colors.grey)),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(ctx);
+              try {
+                await context.read<FavoriteProvider>().clearAll();
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('تم تفريغ المفضلة بنجاح')),
+                  );
+                }
+              } catch (e) {
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('فشل حذف العناصر من السيرفر، يرجى المحاولة لاحقاً'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              }
+            },
+            child: const Text('حذف', style: TextStyle(color: AppColors.error)),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    // بنراقب مجموعة المفضلة الحالية، عشان لو أُلغيت مفضلة من هون
-    // أو من شاشة تانية، القائمة تتحدث فورًا بدون إعادة تحميل من السيرفر
     final favoriteIds = context.watch<FavoriteProvider>().favoriteIds;
     final visibleProducts =
         _products.where((p) => favoriteIds.contains(p.id)).toList();
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: SafeArea(
-        child: Column(
+      appBar: AppBar(
+        backgroundColor: AppColors.primaryDark,
+        elevation: 0,
+        automaticallyImplyLeading: false,
+        titleSpacing: 0,
+        systemOverlayStyle: SystemUiOverlayStyle.light, 
+        title: Row(
           children: [
-            Container(
-              width: double.infinity,
-              color: AppColors.primaryDark,
-              padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
-              child: const Text(
-                'المفضلة',
-                style: TextStyle(
-                  color: AppColors.textOnPrimary,
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                ),
+            IconButton(
+              icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textOnPrimary, size: 20),
+              onPressed: () => Navigator.pop(context),
+            ),
+            const SizedBox(width: 4),
+            const Text(
+              'المفضلة',
+              style: TextStyle(
+                color: AppColors.textOnPrimary,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
               ),
             ),
-            Expanded(child: _buildBody(visibleProducts)),
+            const Spacer(),
+            if (visibleProducts.isNotEmpty)
+              IconButton(
+                icon: const Icon(Icons.delete_sweep_rounded, color: AppColors.textOnPrimary, size: 26),
+                tooltip: 'حذف جميع العناصر',
+                onPressed: () => _clearAllFavorites(context),
+              ),
+            const SizedBox(width: 8),
           ],
         ),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1),
+          child: Divider(
+            height: 1,
+            thickness: 1,
+            color: AppColors.border.withOpacity(0.2),
+          ),
+        ),
       ),
+      body: _buildBody(visibleProducts),
     );
   }
 

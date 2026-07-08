@@ -33,11 +33,19 @@ class _MainScreenState extends State<MainScreen> {
         decoration: BoxDecoration(
           color: AppColors.surface,
           borderRadius: BorderRadius.circular(24),
+          // ── التعديل هنا: جعل الحواف بلون أخضر ناعم ومتناسق مع الهوية ──
+          border: Border.all(
+            color: AppColors.primary.withOpacity(
+              0.15,
+            ), // لون أخضر شفاف يعطي فخامة بدون حدة
+            width: 1.5, // زيادة السمك قليلاً لتبرز الحافة
+          ),
           boxShadow: [
             BoxShadow(
-              color: AppColors.primaryDark.withOpacity(0.06),
-              blurRadius: 20,
-              offset: const Offset(0, 8),
+              // ظل ناعم مائل للأخضر الداكن ليعطي عمقاً جميلاً خلف الشريط
+              color: AppColors.primaryDark.withOpacity(0.05),
+              blurRadius: 16,
+              offset: const Offset(0, 6),
             ),
           ],
         ),
@@ -46,49 +54,65 @@ class _MainScreenState extends State<MainScreen> {
           child: SalomonBottomBar(
             currentIndex: _currentIndex,
             onTap: (i) => setState(() => _currentIndex = i),
-            unselectedItemColor: AppColors.textHint,
+            unselectedItemColor: AppColors.textSecondary,
             curve: Curves.easeInOutCubic,
             duration: const Duration(milliseconds: 400),
             items: [
               SalomonBottomBarItem(
                 icon: Icon(
-                  _currentIndex == 0 ? Icons.home : Icons.home_outlined,
+                  _currentIndex == 0 ? Icons.home_rounded : Icons.home_outlined,
                 ),
                 title: const Text(
                   "الرئيسية",
-                  style: TextStyle(fontFamily: 'Cairo'),
+                  style: TextStyle(
+                    fontFamily: 'Cairo',
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 selectedColor: AppColors.primary,
               ),
               SalomonBottomBarItem(
                 icon: Icon(
-                  _currentIndex == 1 ? Icons.favorite : Icons.favorite_border,
+                  _currentIndex == 1
+                      ? Icons.favorite_rounded
+                      : Icons.favorite_border_rounded,
                 ),
                 title: const Text(
                   "المفضلة",
-                  style: TextStyle(fontFamily: 'Cairo'),
+                  style: TextStyle(
+                    fontFamily: 'Cairo',
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 selectedColor: AppColors.secondary,
               ),
               SalomonBottomBarItem(
                 icon: Icon(
                   _currentIndex == 2
-                      ? Icons.shopping_cart
+                      ? Icons.shopping_cart_rounded
                       : Icons.shopping_cart_outlined,
                 ),
                 title: const Text(
                   "السلة",
-                  style: TextStyle(fontFamily: 'Cairo'),
+                  style: TextStyle(
+                    fontFamily: 'Cairo',
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 selectedColor: AppColors.primary,
               ),
               SalomonBottomBarItem(
                 icon: Icon(
-                  _currentIndex == 3 ? Icons.person : Icons.person_outline,
+                  _currentIndex == 3
+                      ? Icons.person_rounded
+                      : Icons.person_outline_rounded,
                 ),
                 title: const Text(
                   "الحساب",
-                  style: TextStyle(fontFamily: 'Cairo'),
+                  style: TextStyle(
+                    fontFamily: 'Cairo',
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 selectedColor: AppColors.primaryDark,
               ),

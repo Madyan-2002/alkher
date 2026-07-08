@@ -2,6 +2,7 @@ import 'package:alkher/providers/product_provider.dart';
 import 'package:alkher/screens/user/widgets/custom_card.dart';
 import 'package:alkher/styles/app_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 class DonationScreen extends StatefulWidget {
@@ -29,17 +30,29 @@ class _DonationScreenState extends State<DonationScreen> {
       backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: AppColors.primaryDark,
+        elevation: 0,
+        centerTitle: true,
+        systemOverlayStyle: SystemUiOverlayStyle.light,
         leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: Icon(Icons.arrow_back_ios, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textOnPrimary, size: 20),
         ),
         title: const Text(
           'التبرعات',
-          style: TextStyle(color: AppColors.textOnPrimary, fontWeight: .bold),
+          style: TextStyle(
+            color: AppColors.textOnPrimary, 
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+          ),
         ),
-        centerTitle: true,
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1),
+          child: Divider(
+            height: 1,
+            thickness: 1,
+            color: AppColors.border.withOpacity(0.2),
+          ),
+        ),
       ),
 
       body: Consumer<ProductProvider>(
@@ -48,19 +61,28 @@ class _DonationScreenState extends State<DonationScreen> {
           switch (status) {
             case LoadStatus.loading:
             case LoadStatus.initial:
-              return const Center(child: CircularProgressIndicator());
+              return const Center(
+                child: CircularProgressIndicator(color: AppColors.primary),
+              );
 
             case LoadStatus.error:
               return Center(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.error, color: Colors.red, size: 50),
-                    const SizedBox(height: 10),
-                    Text(provider.errorFor(_type) ?? 'حدث خطأ'),
-                    const SizedBox(height: 10),
+                    const Icon(Icons.wifi_off_rounded, color: AppColors.textHint, size: 50),
+                    const SizedBox(height: 12),
+                    Text(
+                      provider.errorFor(_type) ?? 'حدث خطأ أثناء التحميل',
+                      style: const TextStyle(color: AppColors.textSecondary),
+                    ),
+                    const SizedBox(height: 16),
                     ElevatedButton(
                       onPressed: () => provider.fetchByType(_type),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primaryDark,
+                        foregroundColor: AppColors.textOnPrimary,
+                      ),
                       child: const Text('إعادة المحاولة'),
                     ),
                   ],
@@ -71,24 +93,41 @@ class _DonationScreenState extends State<DonationScreen> {
               final products = provider.productsFor(_type);
 
               if (products.isEmpty) {
-                return const Center(child: Text('لا توجد منتجات حالياً'));
+                return const Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.volunteer_activism_outlined, size: 56, color: AppColors.textHint),
+                      SizedBox(height: 12),
+                      Text(
+                        'لا توجد حملات تبرع حالياً',
+                        style: TextStyle(color: AppColors.textSecondary, fontSize: 14),
+                      ),
+                    ],
+                  ),
+                );
               }
 
               return RefreshIndicator(
+                color: AppColors.primary,
                 onRefresh: () => provider.refresh(_type),
-
-                child: GridView.builder(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: products.length,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    mainAxisSpacing: 14,
-                    crossAxisSpacing: 14,
-                    childAspectRatio: 0.72,
+                // ── هنا الحل: استخدام SafeArea مخصص للأسفل فقط لحماية الكروت من أزرار النظام ──
+                child: SafeArea(
+                  top: false, // تعطيل الأعلى لأن الـ AppBar يتعامل معه
+                  bottom: true, // تفعيل الأسفل ليدفع الكروت فوق أزرار الخروج والرجوع للهاتف
+                  child: GridView.builder(
+                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 24), // زيادة الحافة السفلية للراحة البصرية
+                    itemCount: products.length,
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      mainAxisSpacing: 14,
+                      crossAxisSpacing: 14,
+                      childAspectRatio: 0.72,
+                    ),
+                    itemBuilder: (context, index) {
+                      return CustomCard(product: products[index]);
+                    },
                   ),
-                  itemBuilder: (context, index) {
-                    return CustomCard(product: products[index]);
-                  },
                 ),
               );
           }

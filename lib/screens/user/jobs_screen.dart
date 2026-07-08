@@ -32,10 +32,7 @@ class _JobsScreenState extends State<JobsScreen> {
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios_new,
-            color: Colors.white,         
-          ),
+          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -86,18 +83,23 @@ class _JobsScreenState extends State<JobsScreen> {
 
               return RefreshIndicator(
                 onRefresh: () => provider.refresh(_type),
-                child: GridView.builder(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: jobs.length,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    mainAxisSpacing: 14,
-                    crossAxisSpacing: 14,
-                    childAspectRatio: 0.72,
+                child: SafeArea(
+                  bottom: true,
+                  top: false,
+                  child: GridView.builder(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: jobs.length,
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          mainAxisSpacing: 14,
+                          crossAxisSpacing: 14,
+                          childAspectRatio: 0.72,
+                        ),
+                    itemBuilder: (context, index) {
+                      return CustomCard(product: jobs[index]);
+                    },
                   ),
-                  itemBuilder: (context, index) {
-                    return CustomCard(product: jobs[index]);
-                  },
                 ),
               );
           }

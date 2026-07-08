@@ -46,7 +46,6 @@ class CustomCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final valueText = _valueText();
-    // بيراقب بس حالة هاد المنتج بالذات، مش كل الـ Provider
     final isFavorite = context.select<FavoriteProvider, bool>(
       (p) => p.isFavorite(product.id),
     );
@@ -58,68 +57,59 @@ class CustomCard extends StatelessWidget {
           builder: (context) => ProductDetailsScreen(product: product),
         ),
       ),
-      child: Container(
-        decoration: BoxDecoration(
-          color: AppColors.surface,
+      child: Card(
+        elevation: 10, 
+        color: AppColors.surface,
+        shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.border),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.04),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
+          side: BorderSide(color: AppColors.border.withOpacity(0.5), width: 1),
         ),
+        clipBehavior: .antiAlias, 
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
               child: Stack(
                 children: [
-                  ClipRRect(
-                    borderRadius: const BorderRadius.vertical(
-                      top: Radius.circular(16),
-                    ),
-                    child: SizedBox(
-                      width: double.infinity,
-                      height: double.infinity,
-                      child: product.images.isNotEmpty
-                          ? Image.network(
-                              ProductCard.getImageUrl(product.images.first),
-                              fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) => Container(
-                                color: AppColors.background,
-                                child: const Icon(
-                                  Icons.image_not_supported_outlined,
-                                  color: AppColors.textHint,
-                                ),
-                              ),
-                            )
-                          : Container(
+                  SizedBox(
+                    width: double.infinity,
+                    height: double.infinity,
+                    child: product.images.isNotEmpty
+                        ? Image.network(
+                            ProductCard.getImageUrl(product.images.first),
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => Container(
                               color: AppColors.background,
                               child: const Icon(
-                                Icons.image_outlined,
+                                Icons.image_not_supported_outlined,
                                 color: AppColors.textHint,
                               ),
                             ),
-                    ),
+                          )
+                        : Container(
+                            color: AppColors.background,
+                            child: const Icon(
+                              Icons.image_outlined,
+                              color: AppColors.textHint,
+                            ),
+                          ),
                   ),
                   Positioned(
-                    top: 8,
-                    right: 8,
+                    top: 10,
+                    right: 10,
                     child: GestureDetector(
                       onTap: () =>
                           context.read<FavoriteProvider>().toggle(product.id),
                       child: Container(
-                        padding: const EdgeInsets.all(6),
+                        padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.9),
+                          color: Colors.white,
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
-                              blurRadius: 4,
+                              color: Colors.black.withOpacity(0.15),
+                              blurRadius: 6,
+                              offset: const Offset(0, 2),
                             ),
                           ],
                         ),
@@ -137,22 +127,23 @@ class CustomCard extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     product.title,
                     style: const TextStyle(
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.bold,
                       fontSize: 14,
                       color: AppColors.textPrimary,
+                      height: 1.2,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                   if (valueText != null) ...[
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 6),
                     Text(
                       valueText,
                       style: TextStyle(

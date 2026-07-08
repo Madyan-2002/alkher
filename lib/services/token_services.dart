@@ -21,7 +21,6 @@ class TokenServices {
     return prefs.getString('role');
   }
 
-  // ── جديد: حفظ وجلب بيانات المستخدم ──────────
   Future<void> saveUserInfo({required String name, required String email}) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('user_name', name);
@@ -38,11 +37,23 @@ class TokenServices {
     return prefs.getString('user_email');
   }
 
+  // ── صورة البروفايل (اسم الملف كما يرجعه السيرفر، مش مسار محلي) ──
+  Future<void> saveProfileImage(String imageName) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('profile_image', imageName);
+  }
+
+  Future<String?> getProfileImage() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('profile_image');
+  }
+
   Future<void> deleteToken() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('token');
     await prefs.remove('role');
     await prefs.remove('user_name');
     await prefs.remove('user_email');
+    await prefs.remove('profile_image');
   }
 }

@@ -37,7 +37,6 @@ class FavoriteService {
     return data.map((id) => id.toString()).toList();
   }
 
-  // ── جديد: جلب المنتجات المفضلة كاملة (للعرض بالشاشة) ──
   Future<List<ProductModel>> getFavoriteProducts() async {
     final token = await TokenServices().getToken();
 
@@ -53,4 +52,17 @@ class FavoriteService {
     final List data = jsonDecode(response.body);
     return data.map((p) => ProductModel.fromJson(p)).toList();
   }
-}
+
+  Future<void> clearAllFavorites() async {
+    final token = await TokenServices().getToken();
+
+    final response = await http.delete(
+      Uri.parse("${ApiConstant.baseUrl}/favorites"),
+      headers: {'Authorization': 'Bearer $token'},
+    );
+
+    if (response.statusCode != 200 && response.statusCode != 204) {
+      throw Exception('فشل حذف جميع العناصر من السيرفر');
+    }
+  }
+} 

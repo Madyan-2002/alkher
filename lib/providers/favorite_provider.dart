@@ -53,6 +53,27 @@ class FavoriteProvider extends ChangeNotifier {
     }
   }
 
+  // الدالة القديمة المعدلة لتصبح Future وتدعم المسح الشامل
+  Future<void> clearAll() async {
+    // 1. نسخ العناصر الحالية للاحتياط في حال فشل السيرفر
+    final previousFavorites = Set<String>.from(_favoriteIds);
+
+    // 2. مسح العناصر محلياً فوراً لتحديث الواجهة بسرعة (Optimistic Update)
+    _favoriteIds.clear();
+    notifyListeners();
+
+    try {
+      // 3. استدعاء دالة حذف الكل من السيرفر (تأكد من وجودها أو دعمها في الـ Service الخاص بك)
+      // إذا لم تكن موجودة بالسيرفر بعد، يمكنك الاكتفاء بالمسح المحلي مؤقتاً
+      await _service.clearAllFavorites(); 
+    } catch (_) {
+      // في حال حدوث خطأ في السيرفر، نعيد العناصر كما كانت
+      _favoriteIds.addAll(previousFavorites);
+      notifyListeners();
+      rethrow; // نمرر الخطأ للشاشة لإظهار تنبيه للمستخدم
+    }
+  }
+
   void clear() {
     _favoriteIds.clear();
     _isLoaded = false;

@@ -1,16 +1,64 @@
+import 'dart:io';
 import 'package:alkher/screens/login_screen.dart';
+import 'package:alkher/screens/seller/widgets/product_card.dart';
+import 'package:alkher/screens/user/edit_profile_screen.dart';
 import 'package:alkher/services/auth_provider.dart';
 import 'package:alkher/styles/app_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
-class ProfileScreenUser extends StatelessWidget {
+class ProfileScreenUser extends StatefulWidget {
   const ProfileScreenUser({super.key});
 
-  void logout(BuildContext context) {
-    // تنظيف بيانات المستخدم من الـ Provider عند تسجيل الخروج
-    context.read<AuthProvider>().logoutUser();
+  @override
+  State<ProfileScreenUser> createState() => _ProfileScreenUserState();
+}
 
+class _ProfileScreenUserState extends State<ProfileScreenUser> {
+  bool _isUploadingImage = false;
+
+  Future<void> _pickAndUploadImage() async {
+    final picker = ImagePicker();
+    final picked = await picker.pickImage(source: ImageSource.gallery, imageQuality: 85);
+    if (picked == null) return;
+
+    final authProvider = context.read<AuthProvider>();
+    final user = authProvider.currentUser;
+    if (user == null) return;
+
+    setState(() => _isUploadingImage = true);
+
+    try {
+      await authProvider.updateProfile(
+        name: user.name,
+        email: user.email,
+        imageFile: File(picked.path),
+      );
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('تم تحديث الصورة بنجاح'),
+          backgroundColor: AppColors.success,
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('فشل رفع الصورة: ${e.toString().replaceAll('Exception: ', '')}'),
+          backgroundColor: AppColors.error,
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _isUploadingImage = false);
+    }
+  }
+
+  Future<void> _logout(BuildContext context) async {
+    await context.read<AuthProvider>().logoutUser();
+    if (!context.mounted) return;
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(builder: (context) => const LoginScreen()),
@@ -21,9 +69,10 @@ class ProfileScreenUser extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authProvider = context.watch<AuthProvider>();
-    
+
     final userName = authProvider.currentUser?.name ?? "مستخدم زائر";
-    final userEmail = authProvider.currentUser?.email ?? "لا يوجد بريد إلكتروني";
+    final imageName = authProvider.profileImageName;
+    final hasImage = imageName != null && imageName.isNotEmpty;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -39,43 +88,63 @@ class ProfileScreenUser extends StatelessWidget {
                   begin: Alignment.topRight,
                   end: Alignment.bottomLeft,
                 ),
-                borderRadius: BorderRadius.vertical(
-                  bottom: Radius.circular(32),
-                ),
+                borderRadius: BorderRadius.vertical(bottom: Radius.circular(32)),
               ),
               child: Column(
                 children: [
-                  Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: const BoxDecoration(
-                      color: AppColors.surface,
-                      shape: BoxShape.circle,
-                    ),
-                    child: const CircleAvatar(
-                      radius: 50,
-                      backgroundColor: AppColors.primaryLight,
-                      child: Icon(Icons.person, size: 55, color: AppColors.primary),
-                    ),
+                  Stack(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: const BoxDecoration(
+                          color: AppColors.surface,
+                          shape: BoxShape.circle,
+                        ),
+                        child: CircleAvatar(
+                          radius: 50,
+                          backgroundColor: AppColors.primaryLight,
+                          backgroundImage: hasImage
+                              ? NetworkImage(ProductCard.getImageUrl(imageName))
+                              : null,
+                          child: !hasImage
+                              ? const Icon(Icons.person, size: 55, color: AppColors.primary)
+                              : null,
+                        ),
+                      ),
+                      Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: GestureDetector(
+                          onTap: _isUploadingImage ? null : _pickAndUploadImage,
+                          child: Container(
+                            width: 34,
+                            height: 34,
+                            decoration: BoxDecoration(
+                              color: AppColors.primaryDark,
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Colors.white, width: 2),
+                            ),
+                            child: _isUploadingImage
+                                ? const Padding(
+                                    padding: EdgeInsets.all(8.0),
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                : const Icon(Icons.camera_alt, size: 16, color: Colors.white),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 16),
-                  
-                  // الاسم الحقيقي المستلم من السيرفر
                   Text(
-                    userName, 
+                    userName,
                     style: const TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
                       color: AppColors.textOnPrimary,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  
-                  // البريد الإلكتروني الحقيقي
-                  Text(
-                    userEmail,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: AppColors.textOnPrimary.withOpacity(0.85),
                     ),
                   ),
                 ],
@@ -84,7 +153,6 @@ class ProfileScreenUser extends StatelessWidget {
 
             const SizedBox(height: 24),
 
-            // ── قائمة خيارات الإعدادات والبطاقات العصرية ──
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
@@ -92,7 +160,10 @@ class ProfileScreenUser extends StatelessWidget {
                   _buildProfileTile(
                     icon: Icons.person_outline,
                     title: "تعديل الملف الشخصي",
-                    onTap: () {},
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const EditProfileScreen()),
+                    ),
                   ),
                   _buildProfileTile(
                     icon: Icons.shopping_bag_outlined,
@@ -114,17 +185,14 @@ class ProfileScreenUser extends StatelessWidget {
                     title: "مركز المساعدة والدعم",
                     onTap: () {},
                   ),
-                  
                   const SizedBox(height: 20),
                   const Divider(height: 1, color: AppColors.border),
                   const SizedBox(height: 20),
-
-                  // ── زر تسجيل الخروج العصري (ElevatedButton) ──
                   SizedBox(
                     width: double.infinity,
                     height: 54,
                     child: ElevatedButton.icon(
-                      onPressed: () => logout(context),
+                      onPressed: () => _logout(context),
                       icon: const Icon(Icons.logout, size: 22),
                       label: const Text(
                         "تسجيل الخروج",
@@ -135,9 +203,7 @@ class ProfileScreenUser extends StatelessWidget {
                         foregroundColor: AppColors.error,
                         elevation: 0,
                         shadowColor: Colors.transparent,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                       ),
                     ),
                   ),
@@ -151,7 +217,6 @@ class ProfileScreenUser extends StatelessWidget {
     );
   }
 
-  // الـ Widget المساعد لبناء عناصر القائمة بشكل موحد وعصري متناسق مع ألوانك
   Widget _buildProfileTile({
     required IconData icon,
     required String title,
@@ -178,7 +243,7 @@ class ProfileScreenUser extends StatelessWidget {
             color: AppColors.primaryLight,
             borderRadius: BorderRadius.circular(10),
           ),
-          child: Icon(icon, color: AppColors.primary, size: 22), // تم إزالة const هنا لتفادي الخطأ السابق
+          child: Icon(icon, color: AppColors.primary, size: 22),
         ),
         title: Text(
           title,
