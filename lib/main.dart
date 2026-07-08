@@ -1,6 +1,7 @@
 import 'package:alkher/providers/favorite_provider.dart';
 import 'package:alkher/providers/product_provider.dart';
 import 'package:alkher/screens/splash_screen.dart';
+import 'package:alkher/services/auth_provider.dart';
 import 'package:alkher/styles/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -18,6 +19,7 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => ProductProvider()),
         ChangeNotifierProvider(create: (_) => FavoriteProvider()),
+        ChangeNotifierProvider(create: (_) => AuthProvider())
       ],
       child: MaterialApp(
         title: 'Alkher',

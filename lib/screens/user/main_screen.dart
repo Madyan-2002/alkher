@@ -51,7 +51,6 @@ class _MainScreenState extends State<MainScreen> {
             duration: const Duration(milliseconds: 400),
             items: [
               SalomonBottomBarItem(
-                // 🛠️ إذا كانت الصفحة الحالية هي 0 اعرض الأيقونة ممتلئة، وإلا اعرضها مفرغة
                 icon: Icon(
                   _currentIndex == 0 ? Icons.home : Icons.home_outlined,
                 ),
@@ -62,7 +61,6 @@ class _MainScreenState extends State<MainScreen> {
                 selectedColor: AppColors.primary,
               ),
               SalomonBottomBarItem(
-                // تفاعل أيقونة المفضلة
                 icon: Icon(
                   _currentIndex == 1 ? Icons.favorite : Icons.favorite_border,
                 ),
@@ -73,7 +71,6 @@ class _MainScreenState extends State<MainScreen> {
                 selectedColor: AppColors.secondary,
               ),
               SalomonBottomBarItem(
-                // تفاعل أيقونة السلة
                 icon: Icon(
                   _currentIndex == 2
                       ? Icons.shopping_cart
@@ -86,7 +83,6 @@ class _MainScreenState extends State<MainScreen> {
                 selectedColor: AppColors.primary,
               ),
               SalomonBottomBarItem(
-                // تفاعل أيقونة الحساب
                 icon: Icon(
                   _currentIndex == 3 ? Icons.person : Icons.person_outline,
                 ),

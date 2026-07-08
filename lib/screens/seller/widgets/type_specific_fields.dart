@@ -62,7 +62,6 @@ class TypeSpecificFields extends StatelessWidget {
         return DonationFieldsWidget(
           key: const ValueKey('donation_widget'),
           accent: accent,
-          targetAmountController: targetAmountController,
           deadline: deadline,
           onPickDeadline: onPickDeadline,
         );

@@ -2,6 +2,7 @@ import 'package:alkher/providers/favorite_provider.dart';
 import 'package:alkher/screens/login_screen.dart';
 import 'package:alkher/screens/seller/seller_screen.dart';
 import 'package:alkher/screens/user/main_screen.dart';
+import 'package:alkher/services/auth_provider.dart';
 import 'package:alkher/services/token_services.dart';
 import 'package:alkher/styles/app_colors.dart';
 import 'package:flutter/material.dart';
@@ -55,6 +56,9 @@ class _SplashScreenState extends State<SplashScreen>
       destination = const LoginScreen();
     } else {
       if (!mounted) return;
+
+      // استرجاع بيانات المستخدم (اسم، إيميل) واستعادة المفضلة قبل التوجيه
+      await context.read<AuthProvider>().loadUserFromStorage();
       await context.read<FavoriteProvider>().loadFavorites();
 
       if (role == 'seller') {

@@ -4,15 +4,15 @@ import 'package:alkher/styles/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class BuyScreen extends StatefulWidget {
-  const BuyScreen({super.key});
+class OtherScreen extends StatefulWidget {
+  const OtherScreen({super.key});
 
   @override
-  State<BuyScreen> createState() => _BuyScreenState();
+  State<OtherScreen> createState() => _OtherScreenState();
 }
 
-class _BuyScreenState extends State<BuyScreen> {
-  static const _type = 'sell';
+class _OtherScreenState extends State<OtherScreen> {
+  static const _type = 'other';
 
   @override
   void initState() {
@@ -27,22 +27,25 @@ class _BuyScreenState extends State<BuyScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
+
       appBar: AppBar(
+        backgroundColor: AppColors.primaryDark,
+        centerTitle: true,
+        elevation: 0,
         leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: Icon(Icons.arrow_back_ios, color: Colors.white),
+          icon: const Icon(
+            Icons.arrow_back_ios_new,
+            color: Colors.white,
+          ),
+          onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
-          'الشراء',
+          'أخرى',
           style: TextStyle(
             color: AppColors.textOnPrimary,
             fontWeight: FontWeight.bold,
           ),
         ),
-        backgroundColor: AppColors.primaryDark,
-        centerTitle: true,
       ),
 
       body: Consumer<ProductProvider>(
@@ -50,19 +53,29 @@ class _BuyScreenState extends State<BuyScreen> {
           final status = provider.statusFor(_type);
 
           switch (status) {
-            case LoadStatus.loading:
             case LoadStatus.initial:
-              return const Center(child: CircularProgressIndicator());
+            case LoadStatus.loading:
+              return const Center(
+                child: CircularProgressIndicator(
+                  color: AppColors.primary,
+                ),
+              );
 
             case LoadStatus.error:
               return Center(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.error, color: Colors.red, size: 50),
-                    const SizedBox(height: 10),
-                    Text(provider.errorFor(_type) ?? 'حدث خطأ'),
-                    const SizedBox(height: 10),
+                    const Icon(
+                      Icons.wifi_off_rounded,
+                      size: 50,
+                      color: AppColors.textHint,
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      provider.errorFor(_type) ?? 'حدث خطأ',
+                    ),
+                    const SizedBox(height: 16),
                     ElevatedButton(
                       onPressed: () => provider.fetchByType(_type),
                       child: const Text('إعادة المحاولة'),
@@ -75,21 +88,40 @@ class _BuyScreenState extends State<BuyScreen> {
               final products = provider.productsFor(_type);
 
               if (products.isEmpty) {
-                return const Center(child: Text('لا توجد منتجات حالياً'));
+                return const Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.category_outlined,
+                        size: 60,
+                        color: AppColors.textHint,
+                      ),
+                      SizedBox(height: 12),
+                      Text(
+                        'لا توجد إعلانات حالياً',
+                        style: TextStyle(
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
               }
 
               return RefreshIndicator(
+                color: AppColors.primary,
                 onRefresh: () => provider.refresh(_type),
-
                 child: GridView.builder(
                   padding: const EdgeInsets.all(16),
-                  itemCount: products.length,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  gridDelegate:
+                      const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
                     mainAxisSpacing: 14,
                     crossAxisSpacing: 14,
                     childAspectRatio: 0.72,
                   ),
+                  itemCount: products.length,
                   itemBuilder: (context, index) {
                     return CustomCard(product: products[index]);
                   },

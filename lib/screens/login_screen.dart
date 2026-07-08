@@ -2,7 +2,7 @@ import 'package:alkher/providers/favorite_provider.dart';
 import 'package:alkher/screens/seller/seller_screen.dart';
 import 'package:alkher/screens/user/main_screen.dart';
 import 'package:alkher/screens/register_screen.dart';
-import 'package:alkher/services/auth_service.dart';
+import 'package:alkher/services/auth_provider.dart';
 import 'package:alkher/services/token_services.dart';
 import 'package:alkher/styles/app_colors.dart';
 import 'package:alkher/widget/custom_text_field.dart';
@@ -25,44 +25,67 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _handleLogin() async {
     setState(() => _isLoading = true);
 
-    final user = await AuthService().login(
-      email: emailController.text,
-      password: passwordController.text,
-    );
+    try {
+      // 1. استدعاء تسجيل الدخول وحفظ البيانات داخل الـ AuthProvider
+      final authProvider = context.read<AuthProvider>();
+      await authProvider.loginUser(
+        email: emailController.text.trim(),
+        password: passwordController.text.trim(),
+      );
 
-    if (user.token.isEmpty) {
+      // جلب كائن المستخدم بعد نجاح العملية من الـ Provider
+      final user = authProvider.currentUser;
+
+      // 2. التحقق من وجود التوكن
+      if (user == null || user.token.isEmpty) {
+        setState(() => _isLoading = false);
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('فشل تسجيل الدخول: بيانات المستخدم غير مكتملة'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+        return;
+      }
+
+      // 3. حفظ التوكن والـ role في الـ TokenServices كما كنت تفعل تماماً
+      await TokenServices().saveToken(user.token);
+      await TokenServices().saveRole(user.role);
+
+      if (!mounted) return;
+
+      // 4. جلب المنتجات المفضلة للمستخدم
+      await context.read<FavoriteProvider>().loadFavorites();
+
+      setState(() => _isLoading = false);
+
+      if (!mounted) return;
+
+      // 5. توجيه المستخدم حسب الـ Role الخاص به
+      Widget destination;
+      if (user.role == 'seller') {
+        destination = const SellerScreen();
+      } else {
+        destination =
+            const MainScreen(); // شاشتك الرئيسية التي تحتوي على الـ Profile
+      }
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => destination),
+      );
+    } catch (e) {
+      // التعامل مع الأخطاء الناتجة من السيرفر (مثل كلمة مرور خاطئة أو إيميل غير موجود)
       setState(() => _isLoading = false);
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('فشل تسجيل الدخول'),
+        SnackBar(
+          content: Text('حدث خطأ: ${e.toString()}'),
           backgroundColor: AppColors.error,
         ),
       );
-      return;
     }
-
-    await TokenServices().saveToken(user.token);
-    await TokenServices().saveRole(user.role);
-
-    if (!mounted) return;
-    await context.read<FavoriteProvider>().loadFavorites();
-
-    setState(() => _isLoading = false);
-
-    if (!mounted) return;
-
-    Widget destination;
-    if (user.role == 'seller') {
-      destination = const SellerScreen();
-    } else {
-      destination = const MainScreen();
-    }
-
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => destination),
-    );
   }
 
   @override

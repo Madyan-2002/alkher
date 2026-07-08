@@ -1,3 +1,4 @@
+import 'package:alkher/screens/user/other_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:alkher/screens/user/buy_screen.dart';
 import 'package:alkher/screens/user/donation_screen.dart';
@@ -79,7 +80,12 @@ class HomeScreen extends StatelessWidget {
                         AppColors.accent, // تدرج فاتح ومريح
                       ],
                       onTap: () {
-                        // وجهتك القادمة هنا
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const OtherScreen(),
+                          ),
+                        );
                       },
                     ),
                   ],
