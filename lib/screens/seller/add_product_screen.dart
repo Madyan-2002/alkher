@@ -31,6 +31,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
   final _targetAmountController = TextEditingController();
   final _salaryController = TextEditingController();
   final _locationController = TextEditingController();
+  final _contactController = TextEditingController();
 
   List<CategoryModel> _categories = [];
   CategoryModel? _selectedCategory;
@@ -94,6 +95,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
     _targetAmountController.dispose();
     _salaryController.dispose();
     _locationController.dispose();
+    _contactController.dispose();
     super.dispose();
   }
 
@@ -199,6 +201,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
           ? double.tryParse(_salaryController.text)
           : null,
       location: _selectedType == 'job' ? _locationController.text.trim() : null,
+      contactNumber: _contactController.text.trim(),
     );
     setState(() => _isLoading = false);
 
@@ -253,6 +256,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                         accent: accent,
                         nameController: _nameController,
                         descController: _descController,
+                         contactController: _contactController,
                       ),
                       const SizedBox(height: 12),
 

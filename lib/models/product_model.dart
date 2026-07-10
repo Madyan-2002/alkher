@@ -18,6 +18,7 @@ class ProductModel {
   final List<String> images;
   final String createdById;
   final String? createdByName;
+  final String contactNumber;
 
   ProductModel({
     required this.id,
@@ -35,6 +36,7 @@ class ProductModel {
     required this.images,
     required this.createdById,
     this.createdByName,
+    required this.contactNumber
   });
 
   factory ProductModel.fromJson(Map<String, dynamic> json) {
@@ -63,6 +65,7 @@ class ProductModel {
           ? (createdByField['_id'] ?? '')
           : (createdByField ?? ''),
       createdByName: createdByField is Map ? createdByField['name'] : null,
+      contactNumber: json['contactNumber'] ?? '',
     );
   }
 }

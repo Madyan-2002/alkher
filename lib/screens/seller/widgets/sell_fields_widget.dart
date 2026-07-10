@@ -10,7 +10,7 @@ class SellFieldsWidget extends StatefulWidget {
   final List<CategoryModel> categories;
   final CategoryModel? selectedCategory;
   final ValueChanged<CategoryModel?> onCategoryChanged;
-  final VoidCallback onCategoryAdded; // ← جديد: يبلغ الشاشة الأب لإعادة تحميل التصنيفات
+  final VoidCallback onCategoryAdded; 
 
   const SellFieldsWidget({
     super.key,
@@ -75,7 +75,7 @@ class _SellFieldsWidgetState extends State<SellFieldsWidget> {
     setState(() => _isAddingCategory = false);
 
     if (success) {
-      widget.onCategoryAdded(); // يبلغ الشاشة الأب تعيد تحميل القائمة
+      widget.onCategoryAdded();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('تم إضافة "$name" بنجاح'),

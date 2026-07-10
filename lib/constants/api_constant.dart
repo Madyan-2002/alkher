@@ -1,4 +1,3 @@
 class ApiConstant {
-
-  static const String baseUrl = 'http://192.168.100.13:3000/alkher/v1';
+  static const String baseUrl = 'https://alkher-server.onrender.com/alkher/v1';
 }

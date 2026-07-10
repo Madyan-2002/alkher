@@ -31,4 +31,26 @@ class FeedbackService {
 
     return response.statusCode == 200;
   }
+
+  Future<bool> sendFeedback({
+  required String message,
+  int? rating,
+}) async {
+  final token = await TokenServices().getToken();
+
+  final response = await http.post(
+    Uri.parse("${ApiConstant.baseUrl}/feedbacks"),
+    headers: {
+      "Authorization": "Bearer $token",
+      "Content-Type": "application/json",
+    },
+    body: jsonEncode({
+      "message": message,
+      "rating": rating,
+    }),
+  );
+
+  return response.statusCode == 201;
 }
+}
+

@@ -1,5 +1,6 @@
 import 'package:alkher/providers/favorite_provider.dart';
 import 'package:alkher/screens/admin/admin_dashboard_screen.dart';
+import 'package:alkher/screens/intro_pages.dart';
 import 'package:alkher/screens/login_screen.dart';
 import 'package:alkher/screens/seller/seller_screen.dart';
 import 'package:alkher/screens/user/main_screen.dart';
@@ -8,6 +9,7 @@ import 'package:alkher/services/token_services.dart';
 import 'package:alkher/styles/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -48,6 +50,18 @@ class _SplashScreenState extends State<SplashScreen>
 
     if (!mounted) return;
 
+    // 1. الفحص أولاً إذا كانت هذه هي المرة الأولى لفتح التطبيق أم لا
+    final prefs = await SharedPreferences.getInstance();
+    final bool isFirstTime = prefs.getBool('is_first_time') ?? true;
+
+    if (isFirstTime) {
+      // توجيه المستخدم لصفحات المقدمة الـ Intro
+      if (!mounted) return;
+      _navigateTo(const IntroPages());
+      return;
+    }
+
+    // 2. إذا لم تكن المرة الأولى، نتابع فحص الجلسة الطبيعي الخاص بك
     final token = await TokenServices().getToken();
     final role = await TokenServices().getRole();
 
@@ -58,7 +72,6 @@ class _SplashScreenState extends State<SplashScreen>
     } else {
       if (!mounted) return;
 
-      // استرجاع بيانات المستخدم (اسم، إيميل) واستعادة المفضلة قبل التوجيه
       await context.read<AuthProvider>().loadUserFromStorage();
       await context.read<FavoriteProvider>().loadFavorites();
 
@@ -74,9 +87,14 @@ class _SplashScreenState extends State<SplashScreen>
     }
 
     if (!mounted) return;
-    Navigator.of(
-      context,
-    ).pushReplacement(MaterialPageRoute(builder: (_) => destination));
+    _navigateTo(destination);
+  }
+
+  // دالة مساعدة للتوجيه النظيف ومنع تكرار الكود
+  void _navigateTo(Widget screen) {
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (_) => screen),
+    );
   }
 
   @override
@@ -120,15 +138,15 @@ class _SplashScreenState extends State<SplashScreen>
                         ),
                       ],
                     ),
-                    child: Icon(
+                    child: const Icon(
                       Icons.volunteer_activism,
                       size: 60,
                       color: AppColors.primaryDark,
                     ),
                   ),
                   const SizedBox(height: 24),
-                  Text(
-                    'الخير',
+                  const Text(
+                    'أثر',
                     style: TextStyle(
                       fontSize: 26,
                       fontWeight: FontWeight.bold,
@@ -145,7 +163,7 @@ class _SplashScreenState extends State<SplashScreen>
                     ),
                   ),
                   const SizedBox(height: 40),
-                  SizedBox(
+                  const SizedBox(
                     width: 28,
                     height: 28,
                     child: CircularProgressIndicator(

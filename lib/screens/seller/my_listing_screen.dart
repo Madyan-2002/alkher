@@ -597,6 +597,7 @@ class _EditListingScreenState extends State<EditListingScreen> {
           : null,
       salary: type == 'job' ? double.tryParse(_salaryController.text) : null,
       location: type == 'job' ? _locationController.text : null,
+      contactNumber: widget.product.contactNumber,
     );
 
     setState(() => _isLoading = false);

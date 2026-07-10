@@ -23,11 +23,11 @@ class _SellerScreenState extends State<SellerScreen> {
 
   @override
   Widget build(BuildContext context) {
-    const activeColor = AppColors.primaryDark; 
+    const activeColor = AppColors.primaryDark;
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: IndexedStack(index: _currentIndex, children: _pages),
+      body: _pages[_currentIndex],
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: Colors.white,

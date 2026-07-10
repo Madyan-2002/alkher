@@ -6,7 +6,6 @@ class ProductCard extends StatelessWidget {
   final ProductModel product;
   const ProductCard({super.key, required this.product});
 
-  // ── جعلتها static عشان أي شاشة تانية (متل MyListingsScreen) تقدر تستخدمها بدون تكرار ──
   static String getImageUrl(String imagePath) {
     if (imagePath.startsWith('http')) {
       return imagePath;
@@ -27,7 +26,6 @@ class ProductCard extends StatelessWidget {
     return '$baseUrl/uploads/$imagePath';
   }
 
-  // ── تسمية النوع بالعربي ────────────────
   String _typeLabel() {
     switch (product.type) {
       case 'sell':
@@ -54,7 +52,6 @@ class ProductCard extends StatelessWidget {
     }
   }
 
-  // ── القيمة المعروضة تختلف حسب النوع، وكل حقل nullable ──
   Widget? _buildValueLabel() {
     switch (product.type) {
       case 'sell':

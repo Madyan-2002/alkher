@@ -273,7 +273,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         const SizedBox(width: 12),
                         Expanded(
                           child: RoleOption(
-                            label: 'بائع / صاحب عمل',
+                            label: 'بائع / متبرع / صاحب عمل',
                             subtitle: 'أنشر إعلانات',
                             icon: Icons.storefront_outlined,
                             isSelected: _selectedRole == 'seller',

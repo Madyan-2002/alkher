@@ -40,6 +40,8 @@ dependencies:
   salomon_bottom_bar: ^3.3.2
   google_nav_bar: ^5.0.7
   provider: ^6.1.5+1
+  flutter_screenutil: ^5.9.3
+  url_launcher: ^6.3.2
 
 dev_dependencies:
   flutter_test:

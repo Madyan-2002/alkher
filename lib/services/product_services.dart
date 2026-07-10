@@ -45,6 +45,7 @@ class ProductServices {
     DateTime? deadline,
     double? salary,
     String? location,
+    required String contactNumber,
     required File image,
   }) async {
     final token = await TokenServices().getToken();
@@ -92,6 +93,7 @@ class ProductServices {
     DateTime? deadline,
     double? salary,
     String? location,
+    required String contactNumber,
   }) async {
     final token = await TokenServices().getToken();
 

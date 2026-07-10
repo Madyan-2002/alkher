@@ -2,6 +2,7 @@ import 'package:alkher/models/product_model.dart';
 import 'package:alkher/providers/favorite_provider.dart';
 import 'package:alkher/screens/seller/widgets/product_card.dart';
 import 'package:alkher/styles/app_colors.dart';
+import 'package:alkher/utils/whatsapp_launcher.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -9,7 +10,7 @@ class ProductDetailsScreen extends StatelessWidget {
   final ProductModel product;
   const ProductDetailsScreen({super.key, required this.product});
 
-  String _typeLabel() {
+  String typeLabel() {
     switch (product.type) {
       case 'sell':
         return 'بيع';
@@ -40,7 +41,7 @@ class ProductDetailsScreen extends StatelessWidget {
       case 'job':
         return 'تقديم على الوظيفة';
       case 'donation':
-        return 'تبرع الآن';
+        return 'تواصل مع المتبرع'; // ← بدل "تبرع الآن"
       default:
         return 'تواصل مع البائع';
     }
@@ -285,8 +286,23 @@ class ProductDetailsScreen extends StatelessWidget {
             ],
             Expanded(
               child: ElevatedButton(
-                onPressed: () {
-                  // TODO: منطق التواصل/التقديم/التبرع الفعلي
+                onPressed: () async {
+                  final success = await WhatsappLauncher.open(
+                    product.contactNumber,
+                    message:
+                        'مرحبًا، أنا مهتم بإعلانك "${product.title}" على تطبيق الخير',
+                  );
+
+                  if (!success && context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                          'تعذر فتح واتساب، تأكد من تثبيته على جهازك',
+                        ),
+                        backgroundColor: AppColors.error,
+                      ),
+                    );
+                  }
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: accent,

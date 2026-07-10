@@ -10,8 +10,9 @@ class AppColors {
   static const secondary      = Color(0xFF66BB6A);
   static const accent         = Color(0xFFA5D6A7);
 
-  // ── Background (تم التعديل إلى Off-White دافئ ومريح) ───
+  // ── Background & Surfaces (محدثة لتناسب العناصر النظيفة والعصرية) ───
   static const background     = Color(0xFFF9F9F7); // عاجي ناعم جداً مريح للعين بديل للرمادي المعتاد
+  static const cardBackground = Color(0xFFFFFFFF); // أبيض صافي ناصع للكروت لتبرز فوق الخلفية العاجية
   static const surface        = Color(0xFFFAFAFA); // أبيض مكسور خفيف جداً لمنع توهج الشاشة الصافي
 
   // ── Text (تعديل طفيف لتناسق أفضل) ─────────────────────────
@@ -19,6 +20,10 @@ class AppColors {
   static const textSecondary  = Color(0xFF686D68); // رمادي مائل للخضرة العشبية الخافتة جداً
   static const textHint       = Color(0xFFB4B8B4);
   static const textOnPrimary  = Color(0xFFFFFFFF);
+
+  // ── Card Decoration (الظلال والعناصر الناعمة للكروت) ────────
+  static final cardShadow     = Colors.black.withOpacity(0.04); // الظل العصري الخفيف المريح للعين
+  static final arrowColor     = Colors.grey.shade300; // لون سهم التنقل الناعم داخل الكروت
 
   // ── Border (تم تنعيمها لتتماشى مع الألوان المكسورة) ────────
   static const border         = Color(0xFFE5E8E5); // حدود ناعمة ومدمجة مع الخلفية الجديدة
