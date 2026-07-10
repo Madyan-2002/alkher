@@ -1,4 +1,5 @@
 import 'package:alkher/providers/favorite_provider.dart';
+import 'package:alkher/screens/admin/admin_dashboard_screen.dart';
 import 'package:alkher/screens/seller/seller_screen.dart';
 import 'package:alkher/screens/user/main_screen.dart';
 import 'package:alkher/screens/register_screen.dart';
@@ -22,53 +23,63 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isLoading = false;
 
   Future<void> _handleLogin() async {
-  setState(() => _isLoading = true);
+    setState(() => _isLoading = true);
 
-  try {
-    final authProvider = context.read<AuthProvider>();
-    await authProvider.loginUser(
-      email: emailController.text.trim(),
-      password: passwordController.text.trim(),
-    );
+    try {
+      final authProvider = context.read<AuthProvider>();
+      await authProvider.loginUser(
+        email: emailController.text.trim(),
+        password: passwordController.text.trim(),
+      );
 
-    final user = authProvider.currentUser;
+      final user = authProvider.currentUser;
 
-    if (user == null || user.token.isEmpty) {
+      if (user == null || user.token.isEmpty) {
+        setState(() => _isLoading = false);
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('فشل تسجيل الدخول'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+        return;
+      }
+
+      if (!mounted) return;
+      await context.read<FavoriteProvider>().loadFavorites();
+
+      setState(() => _isLoading = false);
+
+      if (!mounted) return;
+
+      Widget destination;
+      if (user.role == 'seller') {
+        destination = const SellerScreen();
+      } else if (user.role == 'admin') {
+        destination = const AdminDashboardScreen();
+      } else {
+        destination = const MainScreen();
+      }
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => destination),
+      );
+    } catch (e) {
       setState(() => _isLoading = false);
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('فشل تسجيل الدخول'),
+        SnackBar(
+          content: Text(
+            'حدث خطأ: ${e.toString().replaceAll('Exception: ', '')}',
+          ),
           backgroundColor: AppColors.error,
         ),
       );
-      return;
     }
-
-    if (!mounted) return;
-    await context.read<FavoriteProvider>().loadFavorites();
-
-    setState(() => _isLoading = false);
-
-    if (!mounted) return;
-
-    Widget destination = user.role == 'seller' ? const SellerScreen() : const MainScreen();
-
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => destination),
-    );
-  } catch (e) {
-    setState(() => _isLoading = false);
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('حدث خطأ: ${e.toString().replaceAll('Exception: ', '')}'),
-        backgroundColor: AppColors.error,
-      ),
-    );
   }
-}
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

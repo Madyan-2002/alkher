@@ -1,4 +1,3 @@
-import 'package:alkher/screens/user/cart_screen_user.dart';
 import 'package:alkher/screens/user/favorite_screen_user.dart';
 import 'package:alkher/screens/user/home_screen.dart';
 import 'package:alkher/screens/user/profile_screen_user.dart';
@@ -19,7 +18,6 @@ class _MainScreenState extends State<MainScreen> {
   final screens = [
     const HomeScreen(),
     const FavoriteScreenUser(),
-    const CartScreenUser(),
     const ProfileScreenUser(),
   ];
 
@@ -89,21 +87,6 @@ class _MainScreenState extends State<MainScreen> {
               SalomonBottomBarItem(
                 icon: Icon(
                   _currentIndex == 2
-                      ? Icons.shopping_cart_rounded
-                      : Icons.shopping_cart_outlined,
-                ),
-                title: const Text(
-                  "السلة",
-                  style: TextStyle(
-                    fontFamily: 'Cairo',
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                selectedColor: AppColors.primary,
-              ),
-              SalomonBottomBarItem(
-                icon: Icon(
-                  _currentIndex == 3
                       ? Icons.person_rounded
                       : Icons.person_outline_rounded,
                 ),

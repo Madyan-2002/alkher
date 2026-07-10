@@ -1,4 +1,5 @@
 import 'package:alkher/providers/favorite_provider.dart';
+import 'package:alkher/screens/admin/admin_dashboard_screen.dart';
 import 'package:alkher/screens/login_screen.dart';
 import 'package:alkher/screens/seller/seller_screen.dart';
 import 'package:alkher/screens/user/main_screen.dart';
@@ -63,6 +64,8 @@ class _SplashScreenState extends State<SplashScreen>
 
       if (role == 'seller') {
         destination = const SellerScreen();
+      } else if (role == 'admin') {
+        destination = const AdminDashboardScreen();
       } else if (role == 'customer') {
         destination = const MainScreen();
       } else {
@@ -71,9 +74,9 @@ class _SplashScreenState extends State<SplashScreen>
     }
 
     if (!mounted) return;
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (_) => destination),
-    );
+    Navigator.of(
+      context,
+    ).pushReplacement(MaterialPageRoute(builder: (_) => destination));
   }
 
   @override
