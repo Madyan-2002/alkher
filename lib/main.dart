@@ -17,8 +17,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ScreenUtilInit(
-      // حجم التصميم المرجعي - غالبًا الشاشة يلي جربت التطبيق عليها
-      designSize: const Size(375, 812), // مقاس iPhone X تقريبي، شائع كمرجع
+      designSize: const Size(375, 812),
       minTextAdapt: true,
       splitScreenMode: true,
       builder: (context, child) {
@@ -32,13 +31,11 @@ class MyApp extends StatelessWidget {
             title: 'Alkher',
             debugShowCheckedModeBanner: false,
             builder: (context, widget) {
-              // ── هون السحر: نطبّق تحجيم تلقائي على كل شي بدون ما نلمس أي شاشة ──
               final mediaQuery = MediaQuery.of(context);
               final screenWidth = mediaQuery.size.width;
 
-              // نحسب معامل تحجيم بناءً على عرض الشاشة الفعلي مقارنة بالمرجع (375)
               double scaleFactor = screenWidth / 375;
-              scaleFactor = scaleFactor.clamp(0.85, 1.25); // حدود آمنة (مش أصغر/أكبر من اللازم)
+              scaleFactor = scaleFactor.clamp(0.85, 1.25);
 
               return MediaQuery(
                 data: mediaQuery.copyWith(
@@ -60,7 +57,10 @@ class MyApp extends StatelessWidget {
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: AppColors.borderFocus, width: 1.5),
+                  borderSide: BorderSide(
+                    color: AppColors.borderFocus,
+                    width: 1.5,
+                  ),
                 ),
               ),
             ),
