@@ -19,8 +19,15 @@ class JobFieldsWidget extends StatelessWidget {
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.border),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.border, width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.025),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -55,43 +62,37 @@ class JobFieldsWidget extends StatelessWidget {
       children: [
         Text(
           label,
-          style: const TextStyle(
-            fontSize: 13,
-            color: AppColors.textSecondary,
-            fontWeight: FontWeight.w500,
-          ),
+          style: TextStyle(fontSize: 12.5, color: accent, fontWeight: FontWeight.w700),
         ),
-        const SizedBox(height: 6),
+        const SizedBox(height: 7),
         TextFormField(
           controller: controller,
           keyboardType: keyboardType,
-          validator: (val) => val == null || val.isEmpty ? 'مطلوب' : null,
-          style: const TextStyle(color: AppColors.textPrimary),
+          validator: (val) => val == null || val.trim().isEmpty ? 'مطلوب' : null,
+          style: const TextStyle(color: AppColors.textPrimary, fontSize: 14.5),
           decoration: InputDecoration(
             hintText: hint,
             prefixText: prefix,
+            hintStyle: const TextStyle(color: AppColors.textHint, fontSize: 13.5),
             filled: true,
-            fillColor: AppColors.surface,
+            fillColor: accent.withOpacity(0.045),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: AppColors.border),
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: accent.withOpacity(0.35), width: 1.4),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: accent, width: 1.5),
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: accent, width: 2),
             ),
             errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: AppColors.error, width: 1),
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: AppColors.error, width: 1.4),
             ),
             focusedErrorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: AppColors.error, width: 1.5),
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: AppColors.error, width: 2),
             ),
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 10,
-            ),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
           ),
         ),
       ],

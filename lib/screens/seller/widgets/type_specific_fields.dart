@@ -64,6 +64,7 @@ class TypeSpecificFields extends StatelessWidget {
           accent: accent,
           deadline: deadline,
           onPickDeadline: onPickDeadline,
+          targetAmountController: targetAmountController,
         );
       case 'job':
         return JobFieldsWidget(

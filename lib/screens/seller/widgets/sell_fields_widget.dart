@@ -10,7 +10,7 @@ class SellFieldsWidget extends StatefulWidget {
   final List<CategoryModel> categories;
   final CategoryModel? selectedCategory;
   final ValueChanged<CategoryModel?> onCategoryChanged;
-  final VoidCallback onCategoryAdded; 
+  final VoidCallback onCategoryAdded;
 
   const SellFieldsWidget({
     super.key,
@@ -135,9 +135,13 @@ class _SellFieldsWidgetState extends State<SellFieldsWidget> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
+                Text(
                   'التصنيف',
-                  style: TextStyle(fontSize: 13, color: AppColors.textSecondary, fontWeight: FontWeight.w500),
+                  style: TextStyle(
+                    fontSize: 12.5,
+                    color: widget.accent,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
                 GestureDetector(
                   onTap: _isAddingCategory ? null : _showAddCategoryDialog,
@@ -161,7 +165,7 @@ class _SellFieldsWidgetState extends State<SellFieldsWidget> {
                 ),
               ],
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 7),
             DropdownButtonFormField<CategoryModel>(
               value: widget.selectedCategory,
               hint: const Text('اختر التصنيف'),
@@ -183,8 +187,15 @@ class _SellFieldsWidgetState extends State<SellFieldsWidget> {
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.border),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.border, width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.025),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
+          ),
+        ],
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: children),
     );
@@ -200,13 +211,20 @@ class _SellFieldsWidgetState extends State<SellFieldsWidget> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontSize: 13, color: AppColors.textSecondary, fontWeight: FontWeight.w500)),
-        const SizedBox(height: 6),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 12.5,
+            color: widget.accent,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        const SizedBox(height: 7),
         TextFormField(
           controller: controller,
           keyboardType: keyboardType,
           validator: (val) => val == null || val.isEmpty ? 'مطلوب' : null,
-          style: const TextStyle(color: AppColors.textPrimary),
+          style: const TextStyle(color: AppColors.textPrimary, fontSize: 14.5),
           decoration: _inputDecoration(prefix: prefix, hint: hint),
         ),
       ],
@@ -218,24 +236,25 @@ class _SellFieldsWidgetState extends State<SellFieldsWidget> {
       hintText: hint,
       prefixText: prefix,
       filled: true,
-      fillColor: AppColors.surface,
+      fillColor: widget.accent.withOpacity(0.045),
+      hintStyle: const TextStyle(color: AppColors.textHint, fontSize: 13.5),
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
-        borderSide: const BorderSide(color: AppColors.border),
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: widget.accent.withOpacity(0.35), width: 1.4),
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
-        borderSide: BorderSide(color: widget.accent, width: 1.5),
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: widget.accent, width: 2),
       ),
       errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
-        borderSide: const BorderSide(color: AppColors.error, width: 1),
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: AppColors.error, width: 1.4),
       ),
       focusedErrorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
-        borderSide: const BorderSide(color: AppColors.error, width: 1.5),
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: AppColors.error, width: 2),
       ),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
     );
   }
 }
