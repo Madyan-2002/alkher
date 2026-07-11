@@ -19,28 +19,48 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _controller;
-  late final Animation<double> _fadeAnimation;
-  late final Animation<double> _scaleAnimation;
+    with TickerProviderStateMixin {
+  late final AnimationController _logoController;
+  late final Animation<double> _logoScale;
+  late final Animation<double> _logoOpacity;
+
+  late final AnimationController _textController;
+  late final Animation<Offset> _textSlide;
+  late final Animation<double> _textOpacity;
+
+  late final AnimationController _dotsController;
 
   @override
   void initState() {
     super.initState();
 
-    _controller = AnimationController(
+    _logoController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 500),
+      duration: const Duration(milliseconds: 900),
     );
+    _logoScale = Tween<double>(begin: 0.6, end: 1.0).animate(
+      CurvedAnimation(parent: _logoController, curve: Curves.easeOutBack),
+    );
+    _logoOpacity = CurvedAnimation(parent: _logoController, curve: Curves.easeIn);
 
-    _fadeAnimation = CurvedAnimation(parent: _controller, curve: Curves.easeIn);
+    _textController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 700),
+    );
+    _textSlide = Tween<Offset>(begin: const Offset(0, 0.3), end: Offset.zero).animate(
+      CurvedAnimation(parent: _textController, curve: Curves.easeOutCubic),
+    );
+    _textOpacity = CurvedAnimation(parent: _textController, curve: Curves.easeIn);
 
-    _scaleAnimation = Tween<double>(
-      begin: 0.7,
-      end: 1.0,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutBack));
+    _dotsController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1200),
+    )..repeat();
 
-    _controller.forward();
+    _logoController.forward();
+    Future.delayed(const Duration(milliseconds: 350), () {
+      if (mounted) _textController.forward();
+    });
 
     _checkSessionAndNavigate();
   }
@@ -59,7 +79,6 @@ class _SplashScreenState extends State<SplashScreen>
       return;
     }
 
-    // إذا لم تكن المرة الأولى، نتابع فحص الجلسة الطبيعي الخاص بك
     final token = await TokenServices().getToken();
     final role = await TokenServices().getRole();
 
@@ -88,16 +107,23 @@ class _SplashScreenState extends State<SplashScreen>
     _navigateTo(destination);
   }
 
-  // دالة مساعدة للتوجيه النظيف ومنع تكرار الكود
   void _navigateTo(Widget screen) {
     Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (_) => screen),
+      PageRouteBuilder(
+        transitionDuration: const Duration(milliseconds: 500),
+        pageBuilder: (_, animation, __) => screen,
+        transitionsBuilder: (_, animation, __, child) {
+          return FadeTransition(opacity: animation, child: child);
+        },
+      ),
     );
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _logoController.dispose();
+    _textController.dispose();
+    _dotsController.dispose();
     super.dispose();
   }
 
@@ -109,73 +135,162 @@ class _SplashScreenState extends State<SplashScreen>
         height: double.infinity,
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
             colors: AppColors.primaryGradient,
           ),
         ),
-        child: Center(
-          child: FadeTransition(
-            opacity: _fadeAnimation,
-            child: ScaleTransition(
-              scale: _scaleAnimation,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    width: 120,
-                    height: 120,
-                    decoration: BoxDecoration(
-                      color: AppColors.surface,
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.2),
-                          blurRadius: 20,
-                          offset: const Offset(0, 8),
+        child: Stack(
+          children: [
+            // ── زخرفة دوائر شفافة بالخلفية ──────────
+            Positioned(
+              top: -70,
+              left: -50,
+              child: _decorativeCircle(220),
+            ),
+            Positioned(
+              bottom: -60,
+              right: -60,
+              child: _decorativeCircle(260),
+            ),
+            Positioned(
+              top: 120,
+              right: -30,
+              child: _decorativeCircle(90),
+            ),
+
+            SafeArea(
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // ── الشعار مع توهج طبقي ──────────
+                    ScaleTransition(
+                      scale: _logoScale,
+                      child: FadeTransition(
+                        opacity: _logoOpacity,
+                        child: Container(
+                          width: 130,
+                          height: 130,
+                          decoration: BoxDecoration(
+                            color: AppColors.surface,
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.18),
+                                blurRadius: 30,
+                                offset: const Offset(0, 14),
+                              ),
+                              BoxShadow(
+                                color: Colors.white.withOpacity(0.15),
+                                blurRadius: 0,
+                                spreadRadius: 8,
+                              ),
+                            ],
+                          ),
+                          child: const Icon(
+                            Icons.volunteer_activism,
+                            size: 62,
+                            color: AppColors.primaryDark,
+                          ),
                         ),
-                      ],
-                    ),
-                    child: const Icon(
-                      Icons.volunteer_activism,
-                      size: 60,
-                      color: AppColors.primaryDark,
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  const Text(
-                    'أثر',
-                    style: TextStyle(
-                      fontSize: 26,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.textOnPrimary,
-                      letterSpacing: 1.2,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'معًا نصنع الخير',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: AppColors.textOnPrimary.withOpacity(0.8),
-                    ),
-                  ),
-                  const SizedBox(height: 40),
-                  const SizedBox(
-                    width: 28,
-                    height: 28,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2.5,
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        AppColors.textOnPrimary,
                       ),
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 32),
+
+                    // ── النص بحركة انزلاق من الأسفل ──────────
+                    SlideTransition(
+                      position: _textSlide,
+                      child: FadeTransition(
+                        opacity: _textOpacity,
+                        child: Column(
+                          children: [
+                            const Text(
+                              'أثر',
+                              style: TextStyle(
+                                fontSize: 30,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.textOnPrimary,
+                                letterSpacing: 2,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Container(
+                              width: 36,
+                              height: 2.5,
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.5),
+                                borderRadius: BorderRadius.circular(2),
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              'معًا نصنع الخير',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: AppColors.textOnPrimary.withOpacity(0.8),
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
+
+            // ── مؤشر تحميل نقطي بالأسفل ──────────
+            Positioned(
+              bottom: 60,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: AnimatedBuilder(
+                  animation: _dotsController,
+                  builder: (context, child) {
+                    return Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: List.generate(3, (i) {
+                        final delay = i * 0.2;
+                        final value = (_dotsController.value - delay) % 1.0;
+                        final scale = value < 0.5
+                            ? 0.6 + (value * 2 * 0.6)
+                            : 1.2 - ((value - 0.5) * 2 * 0.6);
+
+                        return Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 4),
+                          width: 8,
+                          height: 8,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: AppColors.textOnPrimary.withOpacity(
+                              0.4 + (scale - 0.6) * 0.75,
+                            ),
+                          ),
+                          transform: Matrix4.identity()..scale(scale.clamp(0.6, 1.2)),
+                          transformAlignment: Alignment.center,
+                        );
+                      }),
+                    );
+                  },
+                ),
+              ),
+            ),
+          ],
         ),
+      ),
+    );
+  }
+
+  Widget _decorativeCircle(double size) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: Colors.white.withOpacity(0.06),
       ),
     );
   }
