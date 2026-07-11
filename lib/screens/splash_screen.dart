@@ -50,18 +50,16 @@ class _SplashScreenState extends State<SplashScreen>
 
     if (!mounted) return;
 
-    // 1. الفحص أولاً إذا كانت هذه هي المرة الأولى لفتح التطبيق أم لا
     final prefs = await SharedPreferences.getInstance();
     final bool isFirstTime = prefs.getBool('is_first_time') ?? true;
 
     if (isFirstTime) {
-      // توجيه المستخدم لصفحات المقدمة الـ Intro
       if (!mounted) return;
       _navigateTo(const IntroPages());
       return;
     }
 
-    // 2. إذا لم تكن المرة الأولى، نتابع فحص الجلسة الطبيعي الخاص بك
+    // إذا لم تكن المرة الأولى، نتابع فحص الجلسة الطبيعي الخاص بك
     final token = await TokenServices().getToken();
     final role = await TokenServices().getRole();
 
